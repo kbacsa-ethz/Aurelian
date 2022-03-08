@@ -1,6 +1,6 @@
 #ifndef STATEMANAGER_H
 #define STATEMANAGER_H
-
+#if 0
 // Function pointers
 typedef unsigned int (*fnPtr)();
 typedef unsigned int (*fnPtrFloat)(float);
@@ -25,5 +25,5 @@ int STATEMANAGER_pop(StateManager *statemanager);
 State *STATEMANAGER_top(StateManager *statemanager);
 int STATEMANAGER_update(StateManager *statemanager, float deltatime);
 int STATEMANAGER_draw(StateManager *statemanager, float deltatime);
-
+#endif // comment
 #endif // STATEMANAGER_H
