@@ -1,12 +1,15 @@
+#include <stdlib.h>
 #include "engine.h"
 #include "graphics.h"
 #include "statemanager.h"
 
 int ENGINE_init(Engine *engine, struct EngineOptions *options) {
+#if 0
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return 1;
     }
+#endif
 
     if (options != NULL) {
         engine -> graphics.width = options -> width;
@@ -24,6 +27,6 @@ int ENGINE_init(Engine *engine, struct EngineOptions *options) {
 int ENGINE_free(Engine *engine) {
     STATEMANAGER_free(&engine -> statemanager);
     GRAPHICS_free(&engine -> graphics);
-    SDL_Quit();
+    //SDL_Quit();
     return 0;
 }

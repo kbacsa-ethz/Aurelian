@@ -8,11 +8,16 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+
+link_libraries(dl)
+link_libraries(OpenGL::GL)
+link_libraries(glfw)
+
+include_directories(include)
+
 file(GLOB SOURCES
     include/*.h
     src/*.c
     )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} glfw)
-target_link_libraries(${PROJECT_NAME} OpenGL::GL)
