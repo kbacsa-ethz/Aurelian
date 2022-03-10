@@ -62,11 +62,20 @@ int main(int argc, char *argv[]) {
     // Vertices of triangle
     GLfloat vertices[] =
     {
-        -0.5f, -0.5f * (float)sqrt(3)/ 3, 0.0f,
-        0.5f, -0.5f * (float)sqrt(3)/ 3, 0.0f,
-        0.0f, 0.5f * (float)sqrt(3) * 2 / 3, 0.0f
+        -0.5f, -0.5f * (float)sqrt(3)/ 3, 0.0f, // Lower left corner
+        0.5f, -0.5f * (float)sqrt(3)/ 3, 0.0f, // Lower right corner
+        0.0f, 0.5f * (float)sqrt(3) * 2 / 3, 0.0f, // Upper corner
+        -0.5f / 2, 0.5f * (float)sqrt(3) / 6, 0.0f, // Inner left
+        0.5f / 2, 0.5f * (float)sqrt(3) / 6, 0.0f, // Inner right
+        0.0f, -0.5f * (float)sqrt(3) / 3, 0.0f, // Inner right
     };
 
+    GLuint indices[] =
+    {
+        0, 3, 5, // Lower left triangle
+        3, 2, 4, // Lower right triangle
+        5, 4, 1 // Upper triangle
+    };
 
     // Create vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -92,11 +101,12 @@ int main(int argc, char *argv[]) {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // Create buffer object reference
-    GLuint VBO;
-
     // Create vertex array object reference (allows to switch between VBOs)
     GLuint VAO;
+    // Create buffer object reference
+    GLuint VBO;
+    // Create index buffer object reference
+    GLuint EBO;
 
     // Create array object for single element
     // MUST BE DONE BEFORE VBO
@@ -104,13 +114,16 @@ int main(int argc, char *argv[]) {
 
     // Create buffer object for single element
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     // Attach to buffer array
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
     // Load vertices (STATIC means that vertices cannot be modified)
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Configure VAO
     // Position, number of vertices, type, no, size, ?
@@ -122,6 +135,7 @@ int main(int argc, char *argv[]) {
     // Bind to zero (prevents change ?)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // MUST BE DONE AFTER VERTEX ARRAY
 
     // Set color to blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
@@ -143,8 +157,7 @@ int main(int argc, char *argv[]) {
 
         // Actual draw function
         // Primitie, index, number of vertices
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
+        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
 
         // Catch events
@@ -154,6 +167,7 @@ int main(int argc, char *argv[]) {
     // Delete VAO and VBO
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
     glDeleteProgram(shaderProgram);
 
     // Free window and free memory of window
