@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "statemanager.h"
+#include "shaders.h"
 
 // Debuggig macros
 #define PRINT_VAR(X) printf(#X " is %d at address %p\n", X, &X);
@@ -11,22 +12,6 @@
 
 #define WIDTH 800
 #define HEIGHT 600
-
-// Vertex Shader source code
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-//Fragment Shader source code
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
-"}\n\0";
-
 
 int main(int argc, char *argv[]) {
 
@@ -77,29 +62,17 @@ int main(int argc, char *argv[]) {
         5, 4, 1 // Upper triangle
     };
 
-    // Create vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    // Create shaders
+    Shaders mainShader;
 
-    // Load shader source
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    // Pass absolute path for now
 
-     // Compile source that was just passed
-    glCompileShader(vertexShader);
-
-    // Repeat for fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    // Wrap up shaders in shader program
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    // Delete individual shaders since they have been copied to the program
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    printf("About to initialize shaders.\n");
+    SHADERS_initialize(
+                &mainShader,
+                "/home/user/moloc2/resource/shaders/default.vert",
+                "/home/user/moloc2/resource/shaders/default.frag"
+                );
 
     // Create vertex array object reference (allows to switch between VBOs)
     GLuint VAO;
@@ -150,7 +123,7 @@ int main(int argc, char *argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Run shader program
-        glUseProgram(shaderProgram);
+        SHADERS_activate(&mainShader);
 
         // Select which VAO to use
         glBindVertexArray(VAO);
@@ -168,7 +141,7 @@ int main(int argc, char *argv[]) {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    glDeleteProgram(shaderProgram);
+    SHADERS_delete(&mainShader);
 
     // Free window and free memory of window
     glfwDestroyWindow(window);
