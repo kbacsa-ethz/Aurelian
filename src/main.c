@@ -63,13 +63,8 @@ int main(int argc, char *argv[]) {
     };
 
     // Create shaders
-    Shaders mainShader;
-
     // Pass absolute path for now
-
-    printf("About to initialize shaders.\n");
-    SHADERS_initialize(
-                &mainShader,
+    GLuint shaderID = SHADERS_initialize(
                 "/home/user/moloc2/resource/shaders/default.vert",
                 "/home/user/moloc2/resource/shaders/default.frag"
                 );
@@ -123,7 +118,7 @@ int main(int argc, char *argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Run shader program
-        SHADERS_activate(&mainShader);
+        SHADERS_activate(shaderID);
 
         // Select which VAO to use
         glBindVertexArray(VAO);
@@ -141,7 +136,7 @@ int main(int argc, char *argv[]) {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    SHADERS_delete(&mainShader);
+    SHADERS_delete(shaderID);
 
     // Free window and free memory of window
     glfwDestroyWindow(window);
