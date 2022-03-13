@@ -11,9 +11,9 @@ struct EngineOptions {
 };
 
 typedef struct {
-  char quit;
-  Graphics graphics;
   StateManager statemanager;
+  Graphics graphics;
+  char quit;
 } Engine;
 
 int ENGINE_init(Engine *engine, struct EngineOptions *options);

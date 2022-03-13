@@ -28,7 +28,7 @@ char *SHADERS_readfile(const char *filename) {
 }
 
 
-int SHADERS_initialize(char *vertexFilename, char *fragmentFilename) {
+GLuint SHADERS_initialize(char *vertexFilename, char *fragmentFilename) {
 
     char *vertexShaderSource = SHADERS_readfile(vertexFilename);
     char *fragmentShaderSource = SHADERS_readfile(fragmentFilename);

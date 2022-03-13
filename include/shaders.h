@@ -3,7 +3,7 @@
 
 #include <glad/glad.h>
 
-int SHADERS_initialize(char *vertexFilename, char *fragmentFilename);
+GLuint SHADERS_initialize(char *vertexFilename, char *fragmentFilename);
 int SHADERS_activate(GLuint ID);
 int SHADERS_delete(GLuint ID);
 
