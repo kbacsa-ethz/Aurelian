@@ -4,7 +4,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "statemanager.h"
+
 #include "shaders.h"
+#include "vbo.h"
+#include "ebo.h"
+#include "vao.h"
 
 // Debuggig macros
 #define PRINT_VAR(X) printf(#X " is %d at address %p\n", X, &X);
@@ -70,73 +74,51 @@ int main(int argc, char *argv[]) {
                 );
 
     // Create vertex array object reference (allows to switch between VBOs)
-    GLuint VAO;
+    GLuint VAO = VAO_initialize();
+    VAO_bind(VAO);
+
     // Create buffer object reference
-    GLuint VBO;
+    GLuint VBO = VBO_initialize(vertices, sizeof(vertices));
     // Create index buffer object reference
-    GLuint EBO;
+    GLuint EBO = EBO_initialize(indices, sizeof(indices));
 
-    // Create array object for single element
-    // MUST BE DONE BEFORE VBO
-    glGenVertexArrays(1, &VAO);
+    // Links VBO to VAO
+    VAO_linkVBO(VBO, 0);
 
-    // Create buffer object for single element
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    // Attach to buffer array
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-    // Load vertices (STATIC means that vertices cannot be modified)
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // Configure VAO
-    // Position, number of vertices, type, no, size, ?
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-
-    // Enable VAO
-    glEnableVertexAttribArray(0);
-
-    // Bind to zero (prevents change ?)
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // MUST BE DONE AFTER VERTEX ARRAY
-
-    // Set color to blue
-    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    // Execute previous command
-    glClear(GL_COLOR_BUFFER_BIT);
-    // Show next buffer
-    glfwSwapBuffers(window);
+    // Unbind all to prevent accidentally modifying them
+    VAO_unbind();
+    VBO_unbind();
+    EBO_unbind();
 
     // Event loop
     while (!glfwWindowShouldClose(window)) {
+        // Set color to blue
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        // Execute previous command
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Run shader program
         SHADERS_activate(shaderID);
 
         // Select which VAO to use
-        glBindVertexArray(VAO);
+        VAO_bind(VAO);
 
         // Actual draw function
-        // Primitie, index, number of vertices
+        // Primitive, index, number of vertices
         glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+
+        // Show next buffer
         glfwSwapBuffers(window);
 
         // Catch events
         glfwPollEvents();
     }
 
-    // Delete VAO and VBO
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    // Delete VAO, VBO, EBO and shaders
     SHADERS_delete(shaderID);
+    VAO_delete(VAO);
+    VBO_delete(VBO);
+    EBO_delete(EBO);
 
     // Free window and free memory of window
     glfwDestroyWindow(window);
