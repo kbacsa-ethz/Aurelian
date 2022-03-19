@@ -29,7 +29,6 @@ char *SHADERS_readfile(const char *filename) {
 
 }
 
-
 GLuint SHADERS_initialize(char *vertexFilename, char *fragmentFilename) {
 
     char *vertexShaderSource = SHADERS_readfile(vertexFilename);
@@ -70,7 +69,6 @@ GLuint SHADERS_initialize(char *vertexFilename, char *fragmentFilename) {
 
     return ID;
 }
-
 
 int SHADERS_activate(GLuint ID) {
     glUseProgram(ID);
