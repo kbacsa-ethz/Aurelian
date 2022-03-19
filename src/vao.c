@@ -13,14 +13,14 @@ GLuint VAO_initialize() {
     return ID;
 }
 
-int VAO_linkVBO(GLuint VBO, GLuint layout) {
+int VAO_linkAttrib(GLuint VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void *offset) {
 
     // Bind VBO
     VBO_bind(VBO);
 
     // Configure VAO
     // Position, number of vertices, type, no, size, ?
-    glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
 
     // Enable VAO
     glEnableVertexAttribArray(layout);

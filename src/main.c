@@ -17,21 +17,8 @@
 #define WIDTH 800
 #define HEIGHT 600
 
-#include <unistd.h>
-#include <stdio.h>
-#include <limits.h>
-
 int main(int argc, char *argv[]) {
-   #if 0
-   char cwd[PATH_MAX];
-   if (getcwd(cwd, sizeof(cwd)) != NULL) {
-       printf("Current working dir: %s\n", cwd);
-   } else {
-       perror("getcwd() error");
-       return 1;
-   }
-   return 0;
-# endif
+
     // Initialize GLFW library
     glfwInit();
 
@@ -61,15 +48,15 @@ int main(int argc, char *argv[]) {
     // Select rendeing area
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    // Vertices of triangle
+    // Vertices coordinates
     GLfloat vertices[] =
-    {
-        -0.5f, -0.5f * (float)sqrt(3)/ 3, 0.0f, // Lower left corner
-        0.5f, -0.5f * (float)sqrt(3)/ 3, 0.0f, // Lower right corner
-        0.0f, 0.5f * (float)sqrt(3) * 2 / 3, 0.0f, // Upper corner
-        -0.5f / 2, 0.5f * (float)sqrt(3) / 6, 0.0f, // Inner left
-        0.5f / 2, 0.5f * (float)sqrt(3) / 6, 0.0f, // Inner right
-        0.0f, -0.5f * (float)sqrt(3) / 3, 0.0f, // Inner right
+    { //               COORDINATES                  /     COLORS           //
+        -0.5f, -0.5f * (float) sqrt(3) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower left corner
+         0.5f, -0.5f * (float) sqrt(3) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower right corner
+         0.0f,  0.5f * (float) sqrt(3) * 2 / 3, 0.0f,     1.0f, 0.6f,  0.32f, // Upper corner
+        -0.25f, 0.5f * (float) sqrt(3) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner left
+         0.25f, 0.5f * (float) sqrt(3) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner right
+         0.0f, -0.5f * (float) sqrt(3) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f  // Inner down
     };
 
     GLuint indices[] =
@@ -81,10 +68,7 @@ int main(int argc, char *argv[]) {
 
     // Create shaders
     // Pass absolute path for now
-    GLuint shaderID = SHADERS_initialize(
-                "default.vert",
-                "default.frag"
-                );
+    GLuint shaderID = SHADERS_initialize("default.vert", "default.frag");
 
     // Create vertex array object reference (allows to switch between VBOs)
     GLuint VAO = VAO_initialize();
@@ -96,12 +80,17 @@ int main(int argc, char *argv[]) {
     GLuint EBO = EBO_initialize(indices, sizeof(indices));
 
     // Links VBO to VAO
-    VAO_linkVBO(VBO, 0);
+    VAO_linkAttrib(VBO, 0, 3, GL_FLOAT, 6 * sizeof(float), (void *) 0);
+    // Offset is half of total size (position + color) to go to color
+    VAO_linkAttrib(VBO, 1, 3, GL_FLOAT, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 
     // Unbind all to prevent accidentally modifying them
     VAO_unbind();
     VBO_unbind();
     EBO_unbind();
+
+    GLuint uniformID = glGetUniformLocation(shaderID, "scale");
+
 
     // Event loop
     while (!glfwWindowShouldClose(window)) {
@@ -112,6 +101,7 @@ int main(int argc, char *argv[]) {
 
         // Run shader program
         SHADERS_activate(shaderID);
+        glUniform1f(uniformID, 1.f);
 
         // Select which VAO to use
         VAO_bind(VAO);
