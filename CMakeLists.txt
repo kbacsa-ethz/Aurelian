@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(moloc2)
+project(aurelian)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -20,4 +20,4 @@ file(GLOB SOURCES
     src/*.c
     )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(aurelian ${SOURCES})
