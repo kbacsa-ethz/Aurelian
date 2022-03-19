@@ -17,8 +17,21 @@
 #define WIDTH 800
 #define HEIGHT 600
 
-int main(int argc, char *argv[]) {
+#include <unistd.h>
+#include <stdio.h>
+#include <limits.h>
 
+int main(int argc, char *argv[]) {
+   #if 0
+   char cwd[PATH_MAX];
+   if (getcwd(cwd, sizeof(cwd)) != NULL) {
+       printf("Current working dir: %s\n", cwd);
+   } else {
+       perror("getcwd() error");
+       return 1;
+   }
+   return 0;
+# endif
     // Initialize GLFW library
     glfwInit();
 
@@ -69,8 +82,8 @@ int main(int argc, char *argv[]) {
     // Create shaders
     // Pass absolute path for now
     GLuint shaderID = SHADERS_initialize(
-                "/home/user/moloc2/resource/shaders/default.vert",
-                "/home/user/moloc2/resource/shaders/default.frag"
+                "default.vert",
+                "default.frag"
                 );
 
     // Create vertex array object reference (allows to switch between VBOs)

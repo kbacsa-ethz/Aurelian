@@ -20,4 +20,9 @@ file(GLOB SOURCES
     src/*.c
     )
 
-add_executable(aurelian ${SOURCES})
+file(GLOB RES_FILES resource/shaders/*.frag resource/shaders/*.vert)
+
+file(COPY ${RES_FILES}
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+add_executable(aurelian ${RES_FILES} ${SOURCES})
