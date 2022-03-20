@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(moloc2)
+project(aurelian)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -21,3 +21,8 @@ file(GLOB SOURCES
     )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE cglm_headers)
+target_link_libraries(${PROJECT_NAME} m)
+
+add_subdirectory(cglm EXCLUDE_FROM_ALL)
