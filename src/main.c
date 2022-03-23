@@ -49,44 +49,36 @@ int main(int argc, char *argv[]) {
   // Load GLAD library
   gladLoadGL();
 
-  // Select rendeing area
+  // Select rendering area
   glViewport(0, 0, width, height);
 
-  Map sample_map = get_sample_map(10, 10, -0.9f, -0.9f, 0.15f);
+  Map sample_map = get_sample_map(500, 500, -2.5f, -2.5f, 0.01f);
 
   GLfloat* vertices = get_map_vertices(sample_map);
   GLuint* indices = get_map_indices(sample_map);
 
-
-// Vertices coordinates //               COORDINATES                  /     COLORS           //
-//  GLfloat vertices[] =
-//      {-0.5f, -0.5f * sqrt((float)(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower left corner
-//      0.5f, -0.5f * sqrt((float)(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower right corner
-//      0.0f,  0.5f * sqrt((float)(3)) * 2 / 3, 0.0f,     1.0f, 0.6f,  0.32f, // Upper corner
-//      -0.25f, 0.5f * sqrt((float)(3)) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner left
-//      0.25f, 0.5f * sqrt((float)(3)) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner right
-//      0.0f, -0.5f * sqrt((float)(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f  // Inner down
-//      };
-
-//  GLuint indices[] =
-//      {
-//          0, 3, 5, // Lower left triangle
-//          3, 2, 4, // Lower right triangle
-//          5, 4, 1 // Upper triangle
-//      };
-
-//  GLfloat vertices[] =
-//      {0.9f, 0.0f, 0.0f,     1.0f, 0.0f,  0.0f,
-//       0.0f, 0.9f, 0.0f,     0.0f, 1.0f,  0.0f,
-//       0.0f,  0.0f, 0.9f,     0.0f, 0.0f,  1.0f,
-//       0.0f, 0.0f, 0.0f,     0.0f, 0.0f, 0.0f,
-//      };
+//  // Define colors (for test)
+//  GLfloat * color_array = (GLfloat *) malloc(3 * sample_map.size_x * sample_map.size_z * sizeof(GLfloat));
+//  if(color_array == NULL){
+//    printf("Cannot initialize map \n");
+//  }
+//
+//  // fill in the color map
+//  for(int z_id=0; z_id < sample_map.size_z; z_id++)
+//    for(int x_id=0; x_id < sample_map.size_x; x_id++) {
+//
+//      // fill the vertices color
+//      color_array[3 * (x_id + sample_map.size_x * z_id)] = ((GLfloat) (x_id % sample_map.size_x)) / ((GLfloat)sample_map.size_x);
+//      color_array[3 * (x_id + sample_map.size_x * z_id) + 1] = (GLfloat) 1.;
+//      color_array[3 * (x_id + sample_map.size_x * z_id) + 2] = ((GLfloat) (z_id % sample_map.size_z)) / ((GLfloat)sample_map.size_x);
+//
+//    }
 
 //  GLfloat vertices[] =
-//      {0.9f, 0.0f, -0.9f,     1.0f, 0.0f,  0.0f,
-//       0.0f, 0.9f, 0.0f,     0.0f, 1.0f,  0.0f,
-//       0.0f,  0.0f, 0.9f,     0.0f, 0.0f,  1.0f,
-//       0.0f, 0.0f, 0.0f,     0.0f, 0.0f, 0.0f,
+//      {0.9f, 0.0f, 0.0f,
+//       0.0f, 0.9f, 0.0f,
+//       0.0f,  0.0f, 0.9f,
+//       0.0f, 0.0f, 0.0f
 //      };
 //
 //  GLuint indices[] =
@@ -131,8 +123,11 @@ int main(int argc, char *argv[]) {
 //  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 //  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glBufferData(GL_ARRAY_BUFFER, 3 * sample_map.size_x * sample_map.size_z * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * 2 * (sample_map.size_x - 1) * (sample_map.size_z - 1) * sizeof(GLint), indices, GL_STATIC_DRAW);
+  printf("%lu \n", (GLsizeiptr) (3 * sample_map.size_x * sample_map.size_z * sizeof(GLfloat)));
+
+
+  glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) (3 * sample_map.size_x * sample_map.size_z * sizeof(GLfloat)), vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr) (3 * 2 * (sample_map.size_x - 1) * (sample_map.size_z - 1) * sizeof(GLint)), indices, GL_STATIC_DRAW);
 
   // Configure VAO
   // Position, number of vertices, type, no, size, ?
@@ -159,22 +154,9 @@ int main(int argc, char *argv[]) {
 
   glEnable(GL_DEPTH_TEST);
 
-  // Gets ID of uniform called "scale"
-//  GLuint uniID = glGetUniformLocation(shaderID, "scale");
 
-  float rotation = 0.0f;
-  double prevTime = glfwGetTime();
-
-//  vec3 position = {0.0f, 0.0f, 2.0f};
-//  vec3 orientation ={0.0f, 0.0f, -1.0f};
-//  vec3 up = {0.0f, 1.0f, 0.0f};
-
-//  vec3 position = {0.0f, 1.0f, -0.5f};
-//  vec3 orientation ={0.0f, -0.5f, -0.2f};
-//  vec3 up = {0.0f, 1.0f, 0.0f};
-
-  vec3 position = {0.0f, 1.0f, 0.0f};
-  vec3 orientation ={0.0f, -0.5f, -0.2f};
+  vec3 position = {0.0f, 4.0f, 0.0f};
+  vec3 orientation ={0.0f, -1.0f, -0.1f};
   vec3 up = {0.0f, 1.0f, 0.0f};
 
 
@@ -203,6 +185,8 @@ int main(int argc, char *argv[]) {
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
       position[0] = position[0] - speed;
     }
+
+
 
     // Run shader program
     SHADERS_activate(shaderID);
@@ -253,7 +237,7 @@ int main(int argc, char *argv[]) {
 
     // Actual draw function
     // Primitie, index, number of vertices
-    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 3 * 2 * (sample_map.size_x - 1) * (sample_map.size_z - 1), GL_UNSIGNED_INT, 0);
     glfwSwapBuffers(window);
 
     // Catch events

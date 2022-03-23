@@ -29,7 +29,7 @@ GLfloat* get_map_vertices(Map map){
   int size_all = map.size_x * map.size_z;
 
   // allocate the array
-  GLfloat * vertices_array = (GLfloat *) malloc(3 * size_all * sizeof(float));
+  GLfloat * vertices_array = (GLfloat *) malloc(3 * size_all * sizeof(GLfloat));
   if(vertices_array == NULL){
     printf("Cannot initialize vertices \n");
   }
@@ -110,17 +110,13 @@ GLuint* get_map_indices(Map map){
 
             indices_array[3 * local_index_id] = (GLuint) (x_id + map.size_x * z_id);
             indices_array[3 * local_index_id + 1] = (GLuint) (x_id + 1 + map.size_x * z_id);
-            indices_array[3 * local_index_id + 2] = (GLuint) (x_id + map.size_x * (z_id + 1));
+            indices_array[3 * local_index_id + 2] = (GLuint) (x_id + 1 + map.size_x * (z_id + 1));
             local_index_id += 1;
           }
         }
       }
 
     }
-
-  for(int id=0; id<size_all; id++){
-    printf(" %d : %d , %d , %d  \n", id, indices_array[3 * id], indices_array[3 * id + 1], indices_array[3 * id + 2]);
-  }
 
   return indices_array;
 

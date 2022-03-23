@@ -13,7 +13,7 @@ Map get_sample_map(int size_x, int size_z, MapPos map_offset_x, MapPos map_offse
   int size_all = size_x * size_z;
 
   // allocate the memory for the map
-  MapPos * map_array = (MapPos *) malloc(size_all * sizeof(MapPos));
+  MapPos * map_array = (MapPos *) malloc(3 * size_all * sizeof(MapPos));
   if(map_array == NULL){
     printf("Cannot initialize map \n");
   }
