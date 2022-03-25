@@ -12,9 +12,15 @@ out vec2 texCoord;
 // Define uniform (modifiable at runtime)
 uniform float scale;
 
+// Input matrices needed for 3D viewing and perspective
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 proj;
+
+
 void main()
 {
-   gl_Position = vec4(aPos.x + aPos.x * scale, aPos.y + aPos.y * scale, aPos.z + aPos.z * scale, 1.0);
+   gl_Position = proj * view * model * vec4(aPos, 1.0);
    color = aColor;
    texCoord = aTex;
 }

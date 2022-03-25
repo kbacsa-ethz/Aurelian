@@ -13,6 +13,7 @@ link_libraries(dl)
 link_libraries(m)
 link_libraries(OpenGL::GL)
 link_libraries(glfw)
+link_libraries(cglm)
 
 include_directories(include)
 
