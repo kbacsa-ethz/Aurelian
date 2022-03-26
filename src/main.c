@@ -5,7 +5,6 @@
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
 #include <cglm/euler.h>
-#include <cglm/io.h>
 
 #include "statemanager.h"
 
@@ -14,9 +13,7 @@
 #include "ebo.h"
 #include "vao.h"
 #include "texture.h"
-
-#define DEBUG 1
-#define CGLM_DEFINE_PRINTS 1
+#include "camera.h"
 
 // Debuggig macros
 #define PRINT_VAR(X) printf(#X " is %d at address %p\n", X, &X);
@@ -102,21 +99,18 @@ int main(int argc, char *argv[]) {
     VBO_unbind();
     EBO_unbind();
 
-    // Get entry point to shader uniform
-    GLuint uniformID = glGetUniformLocation(shaderID, "scale");
-
     // Initialize texture (read image into texture bank)
     GLuint textureID = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
     // Activate uniform (mapping function)
     TEXTURE_texUnit(shaderID, "tex0", 0);
 
-    // rotation variable
-    float rotation = 0.0f;
-    double prevTime = glfwGetTime();
-
     // Enable depth testing (what to draw on top)
     glEnable(GL_DEPTH_TEST);
+
+    Camera *gameCamera;
+    gameCamera = (Camera *) malloc(sizeof(Camera));
+    CAMERA_initialize(gameCamera, WIDTH, HEIGHT, (vec3){0.0f, 0.0f, 2.0f});
 
     // Event loop
     while (!glfwWindowShouldClose(window)) {
@@ -128,35 +122,10 @@ int main(int argc, char *argv[]) {
         // Run shader program
         SHADERS_activate(shaderID);
 
-        double crntTime = glfwGetTime();
+        CAMERA_inputs(gameCamera, window);
 
-        if ((crntTime - prevTime) >= 1 / 60) {
-            rotation += 0.5f;
-            prevTime = crntTime;
-        }
-
-        // init model, view and proj matrix with identity
-        mat4 model, view, proj;
-        glm_mat4_identity(model);
-        glm_mat4_identity(view);
-        glm_mat4_identity(proj);
-
-        //Move back and up
-        glm_translate(view, (vec3){0.0f, -0.5f, -2.0f});
-        // Rotate for 3D effect (y axis)
-        glm_rotate(model, glm_rad(rotation), (vec3){0.0f, 1.0f, 0.0f});
-        // Field of view, aspect ratio, nearest z, furthest z
-        glm_perspective(glm_rad(45.0f), (float)(WIDTH/HEIGHT), 0.1f, 100.0f, proj);
-
-        int modelLoc = glGetUniformLocation(shaderID, "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model[0]);
-        int viewLoc = glGetUniformLocation(shaderID, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view[0]);
-        int projLoc = glGetUniformLocation(shaderID, "proj");
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj[0]);
-
-        // Run uniform (must be done after program activation)
-        glUniform1f(uniformID, 0.5f);
+        // Camera orientation and projection
+        CAMERA_matrix(gameCamera, 45.0f, 0.1f, 100.0f, shaderID, "camMatrix");
 
         TEXTURE_bind(GL_TEXTURE_2D, textureID); // bind to texture reference
 
@@ -180,6 +149,7 @@ int main(int argc, char *argv[]) {
     VBO_delete(VBO);
     EBO_delete(EBO);
     TEXTURE_delete(textureID);
+    CAMERA_delete(gameCamera);
 
     // Free window and free memory of window
     glfwDestroyWindow(window);
