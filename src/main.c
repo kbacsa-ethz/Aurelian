@@ -110,7 +110,12 @@ int main(int argc, char *argv[]) {
 
     Camera *gameCamera;
     gameCamera = (Camera *) malloc(sizeof(Camera));
-    CAMERA_initialize(gameCamera, WIDTH, HEIGHT, (vec3){0.0f, 0.0f, 2.0f});
+    CAMERA_initialize(gameCamera, WIDTH, HEIGHT, (vec3){0.53f, 3.0f, 4.0f});
+
+    // Define callbacks for inputs
+    glfwSetKeyCallback(window, CAMERA_keyboard);
+    glfwSetScrollCallback(window, CAMERA_zoom);
+    glfwSetWindowUserPointer(window, gameCamera);
 
     // Event loop
     while (!glfwWindowShouldClose(window)) {
@@ -122,7 +127,8 @@ int main(int argc, char *argv[]) {
         // Run shader program
         SHADERS_activate(shaderID);
 
-        CAMERA_inputs(gameCamera, window);
+        // Update position based on key inputs
+        CAMERA_inputs(gameCamera);
 
         // Camera orientation and projection
         CAMERA_matrix(gameCamera, 45.0f, 0.1f, 100.0f, shaderID, "camMatrix");

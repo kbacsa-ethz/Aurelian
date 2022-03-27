@@ -1,14 +1,19 @@
+#include <math.h>
 #include "camera.h"
-#include <cglm/io.h>
+
 
 int CAMERA_initialize(Camera *camera, int width, int height, vec3 position) {
+    for(int i = 0; i < KEYBOARD_SIZE; i++) {
+        camera -> activeKeys[i] = false;
+    }
     camera -> width = width;
     camera -> height = height;
+    camera -> zoom = 0;
     camera -> speed = 0.1f;
+    camera -> speedZoom = 1.0f;
     camera -> sensitivity = 100.f;
-    camera -> firstClick = true;
     glm_vec3_copy(position, camera -> position);
-    glm_vec3_copy((vec3){0.0f ,0.0f, -1.0f}, camera -> orientation);
+    glm_vec3_copy((vec3){0.0f, -0.64f, -0.77f}, camera -> orientation);
     glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera -> up);
     return 0;
 }
@@ -31,99 +36,77 @@ int CAMERA_matrix(Camera *camera, float FOVdeg, float nearPlane, float farPlane,
     return 0;
 }
 
-int CAMERA_inputs(Camera *camera, GLFWwindow* window) {
+void CAMERA_keyboard(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    Camera *camera = glfwGetWindowUserPointer(window);
+    camera -> activeKeys[key] = action != GLFW_RELEASE;
+}
 
-    vec3 delta = GLM_VEC3_ONE_INIT;
+void CAMERA_zoom(GLFWwindow* window, double xoffset, double yoffset) {
+    Camera *camera = glfwGetWindowUserPointer(window);
+
+    // Check not equal to 0
+    if (fabs(yoffset) > 0.00001) {
+        if (yoffset > 0) {
+            camera -> zoom = 1;
+        }
+        else {
+            camera -> zoom = -1;
+        }
+    }
+    else {
+        camera -> zoom = 0;
+    }
+}
+
+void CAMERA_inputs(Camera *camera) {
+
+    vec3 delta = GLM_VEC3_ZERO_INIT;
 
     // Handle key inputs
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        glm_vec3_scale(camera -> orientation, camera -> speed, delta);
-        glm_vec3_add(camera -> position, delta, camera -> position);
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        glm_vec3_crossn(camera -> orientation, camera -> up, delta);
+    if (camera -> activeKeys[GLFW_KEY_W]) {
+        delta[2] = 1.0f;
         glm_vec3_scale(delta, camera -> speed, delta);
         glm_vec3_sub(camera -> position, delta, camera -> position);
+        glm_vec3_zero(delta);
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        glm_vec3_scale(camera -> orientation, camera -> speed, delta);
+    if (camera -> activeKeys[GLFW_KEY_A]) {
+        delta[0] = 1.0f;
+        glm_vec3_scale(delta, camera -> speed, delta);
         glm_vec3_sub(camera -> position, delta, camera -> position);
+        glm_vec3_zero(delta);
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        glm_vec3_crossn(camera -> orientation, camera -> up, delta);
+    if (camera -> activeKeys[GLFW_KEY_S]) {
+        delta[2] = 1.0f;
         glm_vec3_scale(delta, camera -> speed, delta);
         glm_vec3_add(camera -> position, delta, camera -> position);
+        glm_vec3_zero(delta);
     }
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        glm_vec3_scale(camera -> up, camera -> speed, delta);
+    if (camera -> activeKeys[GLFW_KEY_D]) {
+        delta[0] = 1.0f;
+        glm_vec3_scale(delta, camera -> speed, delta);
         glm_vec3_add(camera -> position, delta, camera -> position);
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-    {
-        glm_vec3_scale(camera -> up, camera -> speed, delta);
-        glm_vec3_sub(camera -> position, delta, camera -> position);
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    {
-        camera -> speed = 0.4f;
-    }
-    else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-    {
-        camera -> speed = 0.1f;
+        glm_vec3_zero(delta);
     }
 
-    // Handles mouse inputs
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        // Hides mouse cursor
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    for(int i = 0; i++; i < KEYBOARD_SIZE) {
+        camera -> activeKeys[i] = false;
+    }
 
-        // Prevents camera from jumping on the first click
-        if (camera -> firstClick) {
-            glfwSetCursorPos(window, (camera -> width / 2), (camera -> height / 2));
-            camera -> firstClick = false;
+    // Handle zoom
+    if (camera -> zoom) {
+        glm_vec3_copy(camera -> orientation, delta);
+        glm_vec3_scale(delta, camera -> speedZoom, delta);
+
+        if (camera -> zoom > 0) {
+            glm_vec3_add(camera -> position, delta, camera -> position);
+        }
+        else {
+            glm_vec3_sub(camera -> position, delta, camera -> position);
         }
 
-        // Stores the coordinates of the cursor
-        double mouseX;
-        double mouseY;
-        // Fetches the coordinates of the cursor
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-
-        // Normalizes and shifts the coordinates of the cursor such that they begin in the middle of the screen
-        // and then "transforms" them into degrees
-        float rotX = camera -> sensitivity * (float)(mouseY - (camera -> height / 2)) / camera -> height;
-        float rotY = camera -> sensitivity * (float)(mouseX - (camera -> width / 2)) / camera -> width;
-
-        // Calculates upcoming vertical change in the Orientation
-        vec3 newOrientation = GLM_VEC3_ONE_INIT;
-        glm_vec3_copy(camera -> orientation, newOrientation);
-        glm_vec3_crossn(camera -> orientation, camera -> up, delta);
-        glm_vec3_rotate(newOrientation, glm_rad(-rotX), delta); // newOrientation has changed here
-
-        // Decides whether or not the next vertical Orientation is legal or not
-        if (abs(glm_vec3_angle(newOrientation, camera -> up) - glm_rad(90.0f)) <= glm_rad(85.0f)) {
-            glm_vec3_copy(newOrientation, camera -> orientation);
-        }
-
-        // Rotates the Orientation left and right
-        glm_vec3_rotate(camera -> orientation, glm_rad(-rotY), camera -> up);
-
-        // Sets mouse cursor to the middle of the screen so that it doesn't end up roaming around
-        glfwSetCursorPos(window, (camera -> width / 2), (camera -> height / 2));
+        glm_vec3_zero(delta);
+        camera -> zoom = 0; // reset here since mouse callback is slow
     }
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
-        // Unhides cursor since camera is not looking around anymore
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        // Makes sure the next time the camera looks around it doesn't jump
-        camera -> firstClick = true;
-    }
-
-    return 0;
 }
 
 int CAMERA_delete(Camera *camera) {
