@@ -157,9 +157,9 @@ int main(int argc, char *argv[]) {
 
 
     vec4 lightColor;
-    glm_vec3_copy((vec4){1.0f, 1.0f, 0.9f, 1.0f}, lightColor);
+    glm_vec3_copy((vec4){1.0f, 1.0f, 0.99f, 1.0f}, lightColor);
     vec3 lightPos;
-    glm_vec3_copy((vec3){0.5f, 0.5f, 10.0f}, lightPos);
+    glm_vec3_copy((vec3){1.5f, 1.5f, 1.5f}, lightPos);
     mat4 lightModel = GLM_MAT4_IDENTITY_INIT;
     glm_translate(lightModel, lightPos);
 
