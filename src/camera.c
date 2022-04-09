@@ -6,6 +6,8 @@ int CAMERA_initialize(Camera *camera, int width, int height, vec3 position) {
     for(int i = 0; i < KEYBOARD_SIZE; i++) {
         camera -> activeKeys[i] = false;
     }
+
+    glm_mat4_copy(GLM_MAT4_IDENTITY, camera -> cameraMatrix);
     camera -> width = width;
     camera -> height = height;
     camera -> zoom = 0;
@@ -18,11 +20,10 @@ int CAMERA_initialize(Camera *camera, int width, int height, vec3 position) {
     return 0;
 }
 
-int CAMERA_matrix(Camera *camera, float FOVdeg, float nearPlane, float farPlane, GLuint shaderID, const char *uniform) {
+int CAMERA_updateMatrix(Camera *camera, float FOVdeg, float nearPlane, float farPlane) {
     // init model, view and proj matrix with identity
     mat4 view = GLM_MAT4_IDENTITY_INIT;
     mat4 proj = GLM_MAT4_IDENTITY_INIT;
-    mat4 finalTransform = GLM_MAT4_IDENTITY_INIT;
 
     vec3 center;
     glm_vec3_add(camera -> position, camera -> orientation, center);
@@ -30,9 +31,11 @@ int CAMERA_matrix(Camera *camera, float FOVdeg, float nearPlane, float farPlane,
 
     // Field of view, aspect ratio, nearest z, furthest z
     glm_perspective(glm_rad(FOVdeg), (float)(camera -> width / camera -> height), nearPlane, farPlane, proj);
-    glm_mat4_mul(proj, view, finalTransform);
-    glUniformMatrix4fv(glGetUniformLocation(shaderID, uniform), 1, GL_FALSE, (float *)finalTransform);
+    glm_mat4_mul(proj, view, camera -> cameraMatrix);
+}
 
+int CAMERA_matrix(Camera *camera, GLuint shaderID, const char *uniform) {
+    glUniformMatrix4fv(glGetUniformLocation(shaderID, uniform), 1, GL_FALSE, (float *) (camera -> cameraMatrix));
     return 0;
 }
 

@@ -11,6 +11,7 @@
 
 typedef struct {
     bool activeKeys[KEYBOARD_SIZE];
+    mat4 cameraMatrix;
     vec3 position;
     vec3 orientation;
     vec3 up;
@@ -23,7 +24,8 @@ typedef struct {
 } Camera;
 
 int CAMERA_initialize(Camera *camera, int width, int height, vec3 position);
-int CAMERA_matrix(Camera *camera, float FOVdeg, float nearPlane, float farPlane, GLuint shaderID, const char *uniform);
+int CAMERA_updateMatrix(Camera *camera, float FOVdeg, float nearPlane, float farPlane);
+int CAMERA_matrix(Camera *camera, GLuint shaderID, const char *uniform);
 void CAMERA_keyboard(GLFWwindow *window, int key, int scancode, int action, int mods);
 void CAMERA_inputs(Camera *camera);
 void CAMERA_zoom(GLFWwindow* window, double xoffset, double yoffset);

@@ -88,14 +88,14 @@ int SHADERS_compileErrors(unsigned int shader, const char *type) {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &hasCompiled);
         if (hasCompiled == GL_FALSE) {
             glGetShaderInfoLog(shader, ERROR_LOG_LENGTH, NULL, infolog);
-            printf("SHADER_COMPILATION_ERROR for: %s\n", type);
+            printf("SHADER_COMPILATION_ERROR for: %s at %d\n", type, shader);
         }
     }
     else {
         glGetProgramiv(shader, GL_COMPILE_STATUS, &hasCompiled);
         if (hasCompiled == GL_FALSE) {
             glGetShaderInfoLog(shader, ERROR_LOG_LENGTH, NULL, infolog);
-            printf("SHADER_LINKING_ERROR for: %s\n", type);
+            printf("SHADER_LINKING_ERROR for: %s at %d\n", type, shader);
         }
     }
 }
