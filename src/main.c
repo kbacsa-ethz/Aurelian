@@ -53,6 +53,17 @@ int main(int argc, char *argv[]) {
     // Select rendeing area
     glViewport(0, 0, WIDTH, HEIGHT);
 
+    /*
+     * typedef struct {
+    vec2 textUV;
+    vec3 position;
+    vec3 normal;
+    vec3 color;
+} Vertex;
+     *
+    */
+
+
     // Vertices coordinates
     GLfloat vertices[] =
     { //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
@@ -77,6 +88,8 @@ int main(int argc, char *argv[]) {
         -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
          0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
     };
+
+
 
     // Indices for vertices order
     GLuint indices[] =

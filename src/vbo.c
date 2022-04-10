@@ -1,7 +1,7 @@
 #include "vbo.h"
 
 
-GLuint VBO_initialize(GLfloat *vertices, GLsizeiptr size) {
+GLuint VBO_initialize(Vertex *vertices) {
 
     GLuint ID;
 
