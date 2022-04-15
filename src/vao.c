@@ -19,7 +19,7 @@ int VAO_linkAttrib(GLuint VBO, GLuint layout, GLuint numComponents, GLenum type,
     VBO_bind(VBO);
 
     // Configure VAO
-    // Position, number of vertices, type, no, size, ?
+    // Entry in shader, number of component to pass, type, normalize, stride to next point, offset to first data
     glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
 
     // Enable VAO

@@ -14,6 +14,8 @@
 #include "vao.h"
 #include "texture.h"
 #include "camera.h"
+#include "mesh.h"
+
 
 // Debuggig macros
 #define PRINT_VAR(X) printf(#X " is %d at address %p\n", X, &X);
@@ -53,17 +55,6 @@ int main(int argc, char *argv[]) {
     // Select rendeing area
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    /*
-     * typedef struct {
-    vec2 textUV;
-    vec3 position;
-    vec3 normal;
-    vec3 color;
-} Vertex;
-     *
-    */
-
-
     // Vertices coordinates
     GLfloat vertices[] =
     { //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
@@ -89,6 +80,39 @@ int main(int argc, char *argv[]) {
          0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
     };
 
+    Vertices *pyramidVertices;
+    pyramidVertices = (Vertices *) malloc(sizeof(Vertices));
+    pyramidVertices -> sizePositions = 16 * 3 * sizeof(float);
+    pyramidVertices -> sizeColors = 16 * 3 * sizeof(float);
+    pyramidVertices -> sizeNormals = 16 * 3 * sizeof(float);
+    pyramidVertices -> sizeTextUVs = 16 * 2 * sizeof(float);
+
+    pyramidVertices -> positions = malloc(16 * 3 * sizeof(float));
+    for (int i = 0; i < 16; i++) {
+        *(pyramidVertices -> positions + 3*i) = vertices[11*i];
+        *(pyramidVertices -> positions + 3*i + 1) = vertices[11*i + 1];
+        *(pyramidVertices -> positions + 3*i + 2) = vertices[11*i + 2];
+    }
+
+    pyramidVertices -> colors = malloc(16 * 3 * sizeof(float));
+    for (int i = 0; i < 16; i++) {
+        *(pyramidVertices -> colors + 3*i) = vertices[11*i + 3];
+        *(pyramidVertices -> colors + 3*i + 1) = vertices[11*i + 4];
+        *(pyramidVertices -> colors + 3*i + 2) = vertices[11*i + 5];
+    }
+
+    pyramidVertices -> normals = malloc(16 * 3 * sizeof(float));
+    for (int i = 0; i < 16; i++) {
+        *(pyramidVertices -> normals + 3*i) = vertices[11*i + 8];
+        *(pyramidVertices -> normals + 3*i + 1) = vertices[11*i + 9];
+        *(pyramidVertices -> normals + 3*i + 2) = vertices[11*i + 10];
+    }
+
+    pyramidVertices -> textUVs = malloc(16 * 2 * sizeof(float));
+    for (int i = 0; i < 16; i++) {
+        *(pyramidVertices -> textUVs + 2*i) = vertices[11*i + 6];
+        *(pyramidVertices -> textUVs + 2*i + 1) = vertices[11*i + 7];
+    }
 
 
     // Indices for vertices order
@@ -103,7 +127,7 @@ int main(int argc, char *argv[]) {
     };
 
     // Light source (cube)
-    GLfloat lightVertices[] =
+    GLfloat lightPositions[] =
     { //     COORDINATES     //
         -0.1f, -0.1f,  0.1f,
         -0.1f, -0.1f, -0.1f,
@@ -131,43 +155,41 @@ int main(int argc, char *argv[]) {
         4, 6, 7
     };
 
+    Vertices *lightVertices;
+    lightVertices = (Vertices *) malloc(sizeof(Vertices));
+    lightVertices -> positions = malloc(8 * 3 * sizeof(float));
+    for (int i = 0; i < 8; i++) {
+        *(lightVertices -> positions + 3*i) = lightPositions[3*i];
+        *(lightVertices -> positions + 3*i + 1) = lightPositions[3*i + 1];
+        *(lightVertices -> positions + 3*i + 2) = lightPositions[3*i + 2];
+    }
+
+    lightVertices -> colors = NULL;
+    lightVertices -> normals = NULL;
+    lightVertices -> textUVs = NULL;
+
+    lightVertices -> sizePositions = 8 * 3 * sizeof(float);
+    lightVertices -> sizeColors = 0;
+    lightVertices -> sizeNormals = 0;
+    lightVertices -> sizeTextUVs = 0;
+
     // Create shaders
     // Pass absolute path for now
     GLuint shaderID = SHADERS_initialize("default.vert", "default.frag");
 
-    // Create vertex array object reference (allows to switch between VBOs)
-    GLuint VAO = VAO_initialize();
-    VAO_bind(VAO);
+    // Initialize texture (read image into texture bank)
+    int nTextures = 1;
+    GLuint *textures = malloc(nTextures * sizeof(GLuint));
+    *textures = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
-    // Create buffer object reference
-    GLuint VBO = VBO_initialize(vertices, sizeof(vertices));
-    // Create index buffer object reference
-    GLuint EBO = EBO_initialize(indices, sizeof(indices));
-
-    // Links VBO to VAO
-    VAO_linkAttrib(VBO, 0, 3, GL_FLOAT, 11 * sizeof(float), (void *) 0);
-    // Offset is half of total size (position + color) to go to color
-    VAO_linkAttrib(VBO, 1, 3, GL_FLOAT, 11 * sizeof(float), (void *)(3 * sizeof(float)));
-    // Texture coordinates
-    VAO_linkAttrib(VBO, 2, 2, GL_FLOAT, 11 * sizeof(float), (void *)(6 * sizeof(float)));
-    VAO_linkAttrib(VBO, 3, 3, GL_FLOAT, 11 * sizeof(float), (void *)(8 * sizeof(float)));
-
-    // Unbind all to prevent accidentally modifying them
-    VAO_unbind();
-    VBO_unbind();
-    EBO_unbind();
+    Mesh *pyramidMesh = malloc(sizeof(Mesh));
+    MESH_initialize(pyramidMesh, pyramidVertices, indices, textures, sizeof(indices), nTextures);
 
     // Shader for light cube
     GLuint lightShaderID = SHADERS_initialize("light.vert", "light.frag");
-    GLuint lightVAO = VAO_initialize();
-    VAO_bind(lightVAO);
-    GLuint lightVBO = VBO_initialize(lightVertices, sizeof(lightVertices));
-    GLuint lightEBO = EBO_initialize(lightIndices, sizeof(lightIndices));
-    VAO_linkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void *)0);
-    VAO_unbind();
-    VBO_unbind();
-    EBO_unbind();
 
+    Mesh *lightMesh = malloc(sizeof(Mesh));
+    MESH_initialize(lightMesh, lightVertices, lightIndices, textures, sizeof(lightIndices), 0);
 
     vec4 lightColor;
     glm_vec3_copy((vec4){1.0f, 1.0f, 0.99f, 1.0f}, lightColor);
@@ -189,13 +211,6 @@ int main(int argc, char *argv[]) {
     glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
     glUniform4f(glGetUniformLocation(shaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2], lightColor[3]);
     glUniform3f(glGetUniformLocation(shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
-
-
-    // Initialize texture (read image into texture bank)
-    GLuint textureID = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
-
-    // Activate uniform (mapping function)
-    TEXTURE_texUnit(shaderID, "tex0", 0);
 
     // Enable depth testing (what to draw on top)
     glEnable(GL_DEPTH_TEST);
@@ -223,26 +238,8 @@ int main(int argc, char *argv[]) {
         CAMERA_inputs(gameCamera);
         CAMERA_updateMatrix(gameCamera, 45.0f, 0.1f, 100.0f);
 
-        // Run shader program
-        SHADERS_activate(shaderID);
-
-        // Camera orientation and projection
-        CAMERA_matrix(gameCamera, shaderID, "camMatrix");
-
-        TEXTURE_bind(GL_TEXTURE_2D, textureID); // bind to texture reference
-
-        // Select which VAO to use
-        VAO_bind(VAO);
-
-        // Actual draw function
-        // Primitive, index, number of vertices
-        glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, 0);
-
-        // light cube
-        SHADERS_activate(lightShaderID);
-        CAMERA_matrix(gameCamera, lightShaderID, "camMatrix");
-        VAO_bind(lightVAO);
-        glDrawElements(GL_TRIANGLES, sizeof(lightIndices)/sizeof(int), GL_UNSIGNED_INT, 0);
+        MESH_draw(pyramidMesh, shaderID, gameCamera);
+        MESH_draw(lightMesh, lightShaderID, gameCamera);
 
         // Show next buffer
         glfwSwapBuffers(window);
@@ -253,16 +250,26 @@ int main(int argc, char *argv[]) {
 
     // Delete VAO, VBO, EBO and shaders and textures
     SHADERS_delete(shaderID);
-    VAO_delete(VAO);
-    VBO_delete(VBO);
-    EBO_delete(EBO);
+    MESH_delete(pyramidMesh);
     SHADERS_delete(lightShaderID);
-    VAO_delete(lightVAO);
-    VBO_delete(lightVBO);
-    EBO_delete(lightEBO);
+    MESH_delete(lightMesh);
 
-    TEXTURE_delete(textureID);
+    // This only works because there's only one texture
+    TEXTURE_delete(*textures);
     CAMERA_delete(gameCamera);
+
+    // Free static memory
+    free(pyramidVertices -> positions);
+    free(pyramidVertices -> colors);
+    free(pyramidVertices -> normals);
+    free(pyramidVertices -> textUVs);
+    free(pyramidVertices);
+
+    free(lightVertices -> positions);
+    free(lightVertices -> colors);
+    free(lightVertices -> normals);
+    free(lightVertices -> textUVs);
+    free(lightVertices);
 
     // Free window and free memory of window
     glfwDestroyWindow(window);
