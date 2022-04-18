@@ -13,7 +13,6 @@ link_libraries(dl)
 link_libraries(m)
 link_libraries(OpenGL::GL)
 link_libraries(glfw)
-link_libraries(cglm)
 
 include_directories(include)
 
@@ -29,3 +28,5 @@ file(COPY ${RES_FILES}
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(aurelian ${RES_FILES} ${SOURCES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE cglm)
