@@ -8,6 +8,7 @@
 #include "shaders.h"
 #include "map.h"
 #include "map_generator.h"
+#include "mouse_picker.h"
 
 #include <cglm/cglm.h>
 
@@ -20,6 +21,23 @@
 
 const GLuint width = 800;
 const GLuint height = 600;
+
+mat4 view, projection, full_matrix;
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods){
+
+  if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+  {
+    double mouse_x, mouse_y;
+    glfwGetCursorPos(window, &mouse_x, &mouse_y);
+
+    printf("Mouse position: %f %f \n", mouse_x, mouse_y);
+    vec3 mouse_world_coord;
+    MOUSE_PICKER_get_3D_cursor_position(mouse_x, mouse_y, view, projection, width, height, mouse_world_coord);
+    printf("World position: %f %f %f \n", mouse_world_coord[0], mouse_world_coord[1], mouse_world_coord[2]);
+  }
+}
+
 
 int main(int argc, char *argv[]) {
 
@@ -154,6 +172,9 @@ int main(int argc, char *argv[]) {
 
   glEnable(GL_DEPTH_TEST);
 
+  // define a callback
+  glfwSetMouseButtonCallback(window, mouse_button_callback);
+
 
   vec3 position = {0.0f, 4.0f, 0.0f};
   vec3 orientation ={0.0f, -1.0f, -0.1f};
@@ -192,7 +213,6 @@ int main(int argc, char *argv[]) {
     SHADERS_activate(shaderID);
 
     // configure the camera
-    mat4 view, projection, full_matrix;
     glm_mat4_identity(view);
     glm_mat4_identity(projection);
     vec3 vec_local_out;
