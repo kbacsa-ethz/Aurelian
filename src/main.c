@@ -15,6 +15,8 @@
 #include "texture.h"
 #include "camera.h"
 #include "mesh.h"
+#include "map.h"
+#include "map_basic_generator.h"
 
 
 // Debuggig macros
@@ -55,89 +57,122 @@ int main(int argc, char *argv[]) {
     // Select rendeing area
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    // Vertices coordinates
-    GLfloat vertices[] =
-    { //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
-        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+//    // Vertices coordinates
+//    GLfloat vertices[] =
+//    { //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
+//        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+//        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+//         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+//         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+//
+//        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+//        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+//         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+//
+//        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+//         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+//         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+//
+//         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+//         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+//         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
+//
+//         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+//        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+//         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
+//    };
+//
+//    Vertices *pyramidVertices;
+//    pyramidVertices = (Vertices *) malloc(sizeof(Vertices));
+//    pyramidVertices -> sizePositions = 16 * 3 * sizeof(float);
+//    pyramidVertices -> sizeColors = 16 * 3 * sizeof(float);
+//    pyramidVertices -> sizeNormals = 16 * 3 * sizeof(float);
+//    pyramidVertices -> sizeTextUVs = 16 * 2 * sizeof(float);
+//
+//    pyramidVertices -> positions = malloc(16 * 3 * sizeof(float));
+//    for (int i = 0; i < 16; i++) {
+//        *(pyramidVertices -> positions + 3*i) = vertices[11*i];
+//        *(pyramidVertices -> positions + 3*i + 1) = vertices[11*i + 1];
+//        *(pyramidVertices -> positions + 3*i + 2) = vertices[11*i + 2];
+//    }
+//
+//    pyramidVertices -> colors = malloc(16 * 3 * sizeof(float));
+//    for (int i = 0; i < 16; i++) {
+//        *(pyramidVertices -> colors + 3*i) = vertices[11*i + 3];
+//        *(pyramidVertices -> colors + 3*i + 1) = vertices[11*i + 4];
+//        *(pyramidVertices -> colors + 3*i + 2) = vertices[11*i + 5];
+//    }
+//
+//    pyramidVertices -> normals = malloc(16 * 3 * sizeof(float));
+//    for (int i = 0; i < 16; i++) {
+//        *(pyramidVertices -> normals + 3*i) = vertices[11*i + 8];
+//        *(pyramidVertices -> normals + 3*i + 1) = vertices[11*i + 9];
+//        *(pyramidVertices -> normals + 3*i + 2) = vertices[11*i + 10];
+//    }
+//
+//    pyramidVertices -> textUVs = malloc(16 * 2 * sizeof(float));
+//    for (int i = 0; i < 16; i++) {
+//        *(pyramidVertices -> textUVs + 2*i) = vertices[11*i + 6];
+//        *(pyramidVertices -> textUVs + 2*i + 1) = vertices[11*i + 7];
+//    }
 
-        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+    Map main_map = MAP_BASIC_GENERATOR_get_sample_map(500, 500, -2.5f, -2.5f, 0.01f);
 
-        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+    Vertices *mapVertices;
+    mapVertices = (Vertices *) malloc(sizeof(Vertices));
 
-         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
-         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
-         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
+    mapVertices -> positions = MAP_get_positions(main_map);
+    mapVertices -> sizePositions = MAP_get_positions_size(main_map);
 
-         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
-        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
-         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
-    };
+    mapVertices -> normals = MAP_get_normals(main_map);
+    mapVertices -> sizeNormals = MAP_get_normals_size(main_map);
 
-    Vertices *pyramidVertices;
-    pyramidVertices = (Vertices *) malloc(sizeof(Vertices));
-    pyramidVertices -> sizePositions = 16 * 3 * sizeof(float);
-    pyramidVertices -> sizeColors = 16 * 3 * sizeof(float);
-    pyramidVertices -> sizeNormals = 16 * 3 * sizeof(float);
-    pyramidVertices -> sizeTextUVs = 16 * 2 * sizeof(float);
+    mapVertices -> textUVs = MAP_get_text_uvs(main_map, 0.5, 0.5);
+    mapVertices -> sizeTextUVs = MAP_get_text_uvs_size(main_map);
 
-    pyramidVertices -> positions = malloc(16 * 3 * sizeof(float));
-    for (int i = 0; i < 16; i++) {
-        *(pyramidVertices -> positions + 3*i) = vertices[11*i];
-        *(pyramidVertices -> positions + 3*i + 1) = vertices[11*i + 1];
-        *(pyramidVertices -> positions + 3*i + 2) = vertices[11*i + 2];
-    }
-
-    pyramidVertices -> colors = malloc(16 * 3 * sizeof(float));
-    for (int i = 0; i < 16; i++) {
-        *(pyramidVertices -> colors + 3*i) = vertices[11*i + 3];
-        *(pyramidVertices -> colors + 3*i + 1) = vertices[11*i + 4];
-        *(pyramidVertices -> colors + 3*i + 2) = vertices[11*i + 5];
-    }
-
-    pyramidVertices -> normals = malloc(16 * 3 * sizeof(float));
-    for (int i = 0; i < 16; i++) {
-        *(pyramidVertices -> normals + 3*i) = vertices[11*i + 8];
-        *(pyramidVertices -> normals + 3*i + 1) = vertices[11*i + 9];
-        *(pyramidVertices -> normals + 3*i + 2) = vertices[11*i + 10];
-    }
-
-    pyramidVertices -> textUVs = malloc(16 * 2 * sizeof(float));
-    for (int i = 0; i < 16; i++) {
-        *(pyramidVertices -> textUVs + 2*i) = vertices[11*i + 6];
-        *(pyramidVertices -> textUVs + 2*i + 1) = vertices[11*i + 7];
-    }
+    mapVertices -> colors = MAP_get_colors(main_map);
+    mapVertices -> sizeColors = MAP_get_colors_size(main_map);
 
 
-    // Indices for vertices order
-    GLuint indices[] =
-    {
-        0, 1, 2, // Bottom side
-        0, 2, 3, // Bottom side
-        4, 6, 5, // Left side
-        7, 9, 8, // Non-facing side
-        10, 12, 11, // Right side
-        13, 15, 14 // Facing side
-    };
+    GLuint* indices = MAP_get_indices(main_map);
+    size_t size_indices = MAP_get_indices_size(main_map);
 
-    // Light source (cube)
-    GLfloat lightPositions[] =
-    { //     COORDINATES     //
-        -0.1f, -0.1f,  0.1f,
-        -0.1f, -0.1f, -0.1f,
-         0.1f, -0.1f, -0.1f,
-         0.1f, -0.1f,  0.1f,
-        -0.1f,  0.1f,  0.1f,
-        -0.1f,  0.1f, -0.1f,
-         0.1f,  0.1f, -0.1f,
-         0.1f,  0.1f,  0.1f
-    };
+//    // Indices for vertices order
+//    GLuint indices[] =
+//    {
+//        0, 1, 2, // Bottom side
+//        0, 2, 3, // Bottom side
+//        4, 6, 5, // Left side
+//        7, 9, 8, // Non-facing side
+//        10, 12, 11, // Right side
+//        13, 15, 14 // Facing side
+//    };
+
+//    // Light source (cube)
+//    GLfloat lightPositions[] =
+//    { //     COORDINATES     //
+//        -0.1f, -0.1f,  0.1f,
+//        -0.1f, -0.1f, -0.1f,
+//         0.1f, -0.1f, -0.1f,
+//         0.1f, -0.1f,  0.1f,
+//        -0.1f,  0.1f,  0.1f,
+//        -0.1f,  0.1f, -0.1f,
+//         0.1f,  0.1f, -0.1f,
+//         0.1f,  0.1f,  0.1f
+//    };
+
+  // Light source (cube)
+  GLfloat lightPositions[] =
+      { //     COORDINATES     //
+          -0.1f, 0.7f,  0.1f,
+          -0.1f, 0.7f, -0.1f,
+          0.1f, 0.7f, -0.1f,
+          0.1f, 0.7f,  0.1f,
+          -0.1f,  0.9f,  0.1f,
+          -0.1f,  0.9f, -0.1f,
+          0.1f,  0.9f, -0.1f,
+          0.1f,  0.9f,  0.1f
+      };
 
     GLuint lightIndices[] =
     {
@@ -183,7 +218,7 @@ int main(int argc, char *argv[]) {
     *textures = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
     Mesh *pyramidMesh = malloc(sizeof(Mesh));
-    MESH_initialize(pyramidMesh, pyramidVertices, indices, textures, sizeof(indices), nTextures);
+    MESH_initialize(pyramidMesh, mapVertices, indices, textures, MAP_get_indices_size(main_map), nTextures);
 
     // Shader for light cube
     GLuint lightShaderID = SHADERS_initialize("light.vert", "light.frag");
@@ -259,11 +294,14 @@ int main(int argc, char *argv[]) {
     CAMERA_delete(gameCamera);
 
     // Free static memory
-    free(pyramidVertices -> positions);
-    free(pyramidVertices -> colors);
-    free(pyramidVertices -> normals);
-    free(pyramidVertices -> textUVs);
-    free(pyramidVertices);
+    free(mapVertices -> positions);
+    free(mapVertices -> colors);
+    free(mapVertices -> normals);
+    free(mapVertices -> textUVs);
+    free(mapVertices);
+
+    // free the map
+    Map_free(&main_map);
 
     free(lightVertices -> positions);
     free(lightVertices -> colors);
