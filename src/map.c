@@ -145,15 +145,124 @@ GLfloat* MAP_get_normals(Map map){
     printf("Cannot initialize vertices \n");
   }
 
+//  // fill in the map
+//  for(int z_id=0; z_id < map.size_z; z_id++)
+//    for(int x_id=0; x_id < map.size_x; x_id++) {
+//
+//      // fill the vertices id
+//      normals_array[3 * (x_id + map.size_x * z_id)] = (GLfloat) 0.;
+//      normals_array[3 * (x_id + map.size_x * z_id) + 1] = (GLfloat) 1.;
+//      normals_array[3 * (x_id + map.size_x * z_id) + 2] = (GLfloat) 0.;
+//    }
+
+  MapPos sqrt_3 = sqrt(3.);
+
+  MapPos norm_grad_x = (6 * map.cell_length);
+  MapPos norm_grad_z = (2 * sqrt(3.) * map.cell_length);
+
   // fill in the map
   for(int z_id=0; z_id < map.size_z; z_id++)
     for(int x_id=0; x_id < map.size_x; x_id++) {
 
+      MapPos val_left;
+      MapPos val_right;
+
+      // get the values on the same line
+      if(x_id > 0){
+        val_left = map.altitude_array[x_id - 1 + map.size_x * z_id];
+      }
+      else{
+        val_left = map.altitude_array[x_id + map.size_x * z_id];
+      }
+
+      if(x_id < map.size_x - 1){
+        val_right = map.altitude_array[x_id + 1 + map.size_x * z_id];
+      }
+      else{
+        val_right = map.altitude_array[x_id + map.size_x * z_id];
+      }
+
+      // define the local variables
+      MapPos val_left_up;
+      MapPos val_left_down;
+      MapPos val_right_up;
+      MapPos val_right_down;
+
+      // get the values on the other lines
+      if(z_id % 2 == 0){
+
+        if(x_id > 0 && z_id > 0){
+          val_left_up = map.altitude_array[x_id - 1 + map.size_x * (z_id - 1)];
+        }
+        else{
+          val_left_up = map.altitude_array[x_id + map.size_x * z_id];
+        }
+
+        if(x_id > 0 && z_id < map.size_z - 1){
+          val_left_down = map.altitude_array[x_id - 1 + map.size_x * (z_id + 1)];
+        }
+        else{
+          val_left_down = map.altitude_array[x_id + map.size_x * z_id];
+        }
+
+        if(z_id > 0){
+          val_right_up = map.altitude_array[x_id + map.size_x * (z_id - 1)];
+        }
+        else{
+          val_right_up = map.altitude_array[x_id + map.size_x * z_id];
+        }
+
+        if(z_id < map.size_z - 1){
+          val_right_down = map.altitude_array[x_id + map.size_x * (z_id + 1)];
+        }
+        else{
+          val_right_down = map.altitude_array[x_id + map.size_x * z_id];
+        }
+
+      }
+      else{
+
+        if(z_id > 0){
+          val_left_up = map.altitude_array[x_id + map.size_x * (z_id - 1)];
+        }
+        else{
+          val_left_up = map.altitude_array[x_id + map.size_x * z_id];
+        }
+
+        if(z_id < map.size_z - 1){
+          val_left_down = map.altitude_array[x_id + map.size_x * (z_id + 1)];
+        }
+        else{
+          val_left_down = map.altitude_array[x_id + map.size_x * z_id];
+        }
+
+        if(x_id < map.size_x - 1 && z_id > 0){
+          val_right_up = map.altitude_array[x_id + 1 + map.size_x * (z_id - 1)];
+        }
+        else{
+          val_right_up = map.altitude_array[x_id + map.size_x * z_id];
+        }
+
+        if(x_id < map.size_x - 1 && z_id < map.size_z - 1){
+          val_right_down = map.altitude_array[x_id + 1 + map.size_x * (z_id + 1)];
+        }
+        else{
+          val_right_down = map.altitude_array[x_id + map.size_x * z_id];
+        }
+      }
+
+      // compute the gradient
+      MapPos grad_x = ((2 * val_right + val_right_up + val_right_down) -
+                       (2 * val_left + val_left_up + val_left_down)) / norm_grad_x ;
+      MapPos grad_z = ((val_right_down + val_left_down) - (val_left_up + val_right_up)) / norm_grad_z;
+
+
       // fill the vertices id
-      normals_array[3 * (x_id + map.size_x * z_id)] = (GLfloat) 0.;
+      normals_array[3 * (x_id + map.size_x * z_id)] = -(GLfloat) grad_x;
       normals_array[3 * (x_id + map.size_x * z_id) + 1] = (GLfloat) 1.;
-      normals_array[3 * (x_id + map.size_x * z_id) + 2] = (GLfloat) 0.;
+      normals_array[3 * (x_id + map.size_x * z_id) + 2] = -(GLfloat) grad_z;
     }
+
   return normals_array;
 
 }
