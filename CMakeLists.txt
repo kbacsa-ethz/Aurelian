@@ -30,3 +30,5 @@ file(COPY ${RES_FILES}
 add_executable(aurelian ${RES_FILES} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE cglm)
+
+add_subdirectory(cglm EXCLUDE_FROM_ALL)
