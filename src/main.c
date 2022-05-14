@@ -131,9 +131,10 @@ int main(int argc, char *argv[]) {
     GLuint shaderID = SHADERS_initialize("default.vert", "default.frag");
 
     // Initialize texture (read image into texture bank)
-    int nTextures = 1;
+    int nTextures = 2;
     GLuint *textures = malloc(nTextures * sizeof(GLuint));
-    *textures = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+    *textures = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE);
+    *(textures + 1) = TEXTURE_initialize("lennaSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
 
     Mesh *pyramidMesh = malloc(sizeof(Mesh));
     MESH_initialize(pyramidMesh, mapVertices, indices, textures, MAP_get_indices_size(main_map), nTextures);
