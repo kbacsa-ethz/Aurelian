@@ -8,11 +8,9 @@
 
 typedef struct {
     GLfloat *positions;
-    GLfloat *colors;
     GLfloat *normals;
     GLfloat *textUVs;
     size_t sizePositions;
-    size_t sizeColors;
     size_t sizeNormals;
     size_t sizeTextUVs;
 } Vertices;

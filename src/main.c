@@ -72,9 +72,6 @@ int main(int argc, char *argv[]) {
     mapVertices->textUVs = MAP_get_text_uvs(main_map, 0.5, 0.5);
     mapVertices->sizeTextUVs = MAP_get_text_uvs_size(main_map);
 
-    mapVertices->colors = MAP_get_colors(main_map);
-    mapVertices->sizeColors = MAP_get_colors_size(main_map);
-
 
     GLuint *indices = MAP_get_indices(main_map);
     size_t size_indices = MAP_get_indices_size(main_map);
@@ -117,12 +114,10 @@ int main(int argc, char *argv[]) {
         *(lightVertices->positions + 3 * i + 2) = lightPositions[3 * i + 2];
     }
 
-    lightVertices->colors = NULL;
     lightVertices->normals = NULL;
     lightVertices->textUVs = NULL;
 
     lightVertices->sizePositions = 8 * 3 * sizeof(float);
-    lightVertices->sizeColors = 0;
     lightVertices->sizeNormals = 0;
     lightVertices->sizeTextUVs = 0;
 
@@ -136,7 +131,7 @@ int main(int argc, char *argv[]) {
     *textures = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
     Mesh *pyramidMesh = malloc(sizeof(Mesh));
-    MESH_initialize(pyramidMesh, mapVertices, indices, textures, MAP_get_indices_size(main_map), nTextures);
+    MESH_initialize(pyramidMesh, mapVertices, indices, textures, size_indices, nTextures);
 
     // Shader for light cube
     GLuint lightShaderID = SHADERS_initialize("light.vert", "light.frag");
@@ -196,6 +191,8 @@ int main(int argc, char *argv[]) {
         MESH_draw(pyramidMesh, shaderID, gameCamera);
         MESH_draw(lightMesh, lightShaderID, gameCamera);
 
+        // TODO: put shader into mesh
+
         // Show next buffer
         glfwSwapBuffers(window);
 
@@ -215,7 +212,6 @@ int main(int argc, char *argv[]) {
 
     // Free static memory
     free(mapVertices->positions);
-    free(mapVertices->colors);
     free(mapVertices->normals);
     free(mapVertices->textUVs);
     free(mapVertices);
@@ -224,7 +220,6 @@ int main(int argc, char *argv[]) {
     Map_free(&main_map);
 
     free(lightVertices->positions);
-    free(lightVertices->colors);
     free(lightVertices->normals);
     free(lightVertices->textUVs);
     free(lightVertices);

@@ -12,7 +12,7 @@ GLuint VBO_initialize(Vertices *vertices) {
     glBindBuffer(GL_ARRAY_BUFFER, ID);
 
     // Load vertices (STATIC means that vertices cannot be modified)
-    size_t totalSize = vertices -> sizePositions + vertices -> sizeColors + vertices -> sizeNormals + vertices -> sizeTextUVs;
+    size_t totalSize = vertices -> sizePositions + vertices -> sizeNormals + vertices -> sizeTextUVs;
     glBufferData(GL_ARRAY_BUFFER, totalSize, NULL, GL_STATIC_DRAW);
 
     // Load vertex data into sub-arrays
@@ -21,16 +21,16 @@ GLuint VBO_initialize(Vertices *vertices) {
     }
     // TODO Raise error if no positions provided ?
 
-    if (vertices -> colors) {
-        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions, vertices -> sizeColors, vertices -> colors);
-    }
+//    if (vertices -> colors) {
+//        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions, vertices -> sizeColors, vertices -> colors);
+//    }
 
     if (vertices -> normals) {
-        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions + vertices -> sizeColors, vertices -> sizeNormals, vertices -> normals);
+        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions, vertices -> sizeNormals, vertices -> normals);
     }
 
     if (vertices -> textUVs) {
-        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions + vertices -> sizeColors + vertices -> sizeNormals, vertices -> sizeTextUVs, vertices -> textUVs);
+        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions + vertices -> sizeNormals, vertices -> sizeTextUVs, vertices -> textUVs);
     }
 
     return ID;

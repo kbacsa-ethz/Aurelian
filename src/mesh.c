@@ -24,11 +24,11 @@ int MESH_initialize(Mesh *mesh, Vertices *verticesRef, GLuint *indices, GLuint *
     // Links VBO to VAO
     VAO_linkAttrib(mesh -> VBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void *) 0);
     // Offset is half of total size (position + color) to go to color
-    VAO_linkAttrib(mesh -> VBO, 1, 3, GL_FLOAT, 3 * sizeof(float), (void *)(mesh -> vertices -> sizePositions));
+//    VAO_linkAttrib(mesh -> VBO, 1, 3, GL_FLOAT, 3 * sizeof(float), (void *)(mesh -> vertices -> sizePositions));
     // Normals
-    VAO_linkAttrib(mesh -> VBO, 2, 3, GL_FLOAT, 3 * sizeof(float), (void *)(mesh -> vertices -> sizePositions + mesh -> vertices -> sizeColors));
+    VAO_linkAttrib(mesh -> VBO, 1, 3, GL_FLOAT, 3 * sizeof(float), (void *)(mesh -> vertices -> sizePositions));
     // Texture coordinates
-    VAO_linkAttrib(mesh -> VBO, 3, 2, GL_FLOAT, 2 * sizeof(float), (void *)(mesh -> vertices -> sizePositions + mesh -> vertices -> sizeColors + mesh -> vertices -> sizeNormals));
+    VAO_linkAttrib(mesh -> VBO, 2, 2, GL_FLOAT, 2 * sizeof(float), (void *)(mesh -> vertices -> sizePositions + mesh -> vertices -> sizeNormals));
 
     // Unbind all to prevent accidentally modifying them
     VAO_unbind();
