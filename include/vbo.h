@@ -6,17 +6,6 @@
 
 # include "mesh_array.h"
 
-// reformat to DoD
-
-//typedef struct {
-//    GLfloat *positions;
-//    GLfloat *normals;
-//    GLfloat *textUVs;
-//    size_t sizePositions;
-//    size_t sizeNormals;
-//    size_t sizeTextUVs;
-//} Vertices;
-
 
 GLuint VBO_initialize(PositionsArray positions_array, NormalsArray normals_array,
                       TextUVsArray textUVs_array);

@@ -88,66 +88,6 @@ int main(int argc, char *argv[]) {
     IndicesArray test_mesh_indices_array = {.indices_ptr=&test_mesh_indices,
                                             .size_indices=sizeof(test_mesh_indices)};
 
-//    Vertices *mapVertices;
-//    mapVertices = (Vertices *) malloc(sizeof(Vertices));
-//
-//    mapVertices->positions = MAP_get_positions(main_map);
-//    mapVertices->sizePositions = MAP_get_positions_size(main_map);
-//
-//    mapVertices->normals = MAP_get_normals(main_map);
-//    mapVertices->sizeNormals = MAP_get_normals_size(main_map);
-//
-//    mapVertices->textUVs = MAP_get_text_uvs(main_map, 0.5, 0.5);
-//    mapVertices->sizeTextUVs = MAP_get_text_uvs_size(main_map);
-//
-//
-//    GLuint *indices = MAP_get_indices(main_map);
-//    size_t size_indices = MAP_get_indices_size(main_map);
-
-//    // Light source (cube)
-//    GLfloat lightPositions[] =
-//        { //     COORDINATES     //
-//            -0.1f, 0.7f, 0.1f,
-//            -0.1f, 0.7f, -0.1f,
-//            0.1f, 0.7f, -0.1f,
-//            0.1f, 0.7f, 0.1f,
-//            -0.1f, 0.9f, 0.1f,
-//            -0.1f, 0.9f, -0.1f,
-//            0.1f, 0.9f, -0.1f,
-//            0.1f, 0.9f, 0.1f
-//        };
-//
-//    GLuint lightIndices[] =
-//        {
-//            0, 1, 2,
-//            0, 2, 3,
-//            0, 4, 7,
-//            0, 7, 3,
-//            3, 7, 6,
-//            3, 6, 2,
-//            2, 6, 5,
-//            2, 5, 1,
-//            1, 5, 4,
-//            1, 4, 0,
-//            4, 5, 6,
-//            4, 6, 7
-//        };
-//
-//    Vertices *lightVertices;
-//    lightVertices = (Vertices *) malloc(sizeof(Vertices));
-//    lightVertices->positions = malloc(8 * 3 * sizeof(float));
-//    for (int i = 0; i < 8; i++) {
-//        *(lightVertices->positions + 3 * i) = lightPositions[3 * i];
-//        *(lightVertices->positions + 3 * i + 1) = lightPositions[3 * i + 1];
-//        *(lightVertices->positions + 3 * i + 2) = lightPositions[3 * i + 2];
-//    }
-//
-//    lightVertices->normals = NULL;
-//    lightVertices->textUVs = NULL;
-//
-//    lightVertices->sizePositions = 8 * 3 * sizeof(float);
-//    lightVertices->sizeNormals = 0;
-//    lightVertices->sizeTextUVs = 0;
 
     // Create shaders
     // Pass absolute path for now
@@ -166,18 +106,6 @@ int main(int argc, char *argv[]) {
     MESH_initialize(test_mesh_ptr, test_mesh_positions_array, test_mesh_normals_array, test_mesh_textUVs_array,
                     test_mesh_indices_array, textures, nTextures, mesh_shaderID);
 
-//    Mesh *pyramidMesh = malloc(sizeof(Mesh));
-//    MESH_initialize(pyramidMesh, mapVertices, indices, textures, size_indices, nTextures);
-
-
-
-//
-//    // Shader for light cube
-//    GLuint lightShaderID = SHADERS_initialize("light.vert", "light.frag");
-//
-//    Mesh *lightMesh = malloc(sizeof(Mesh));
-//    MESH_initialize(lightMesh, lightVertices, lightIndices, textures, sizeof(lightIndices), 0);
-
     vec4 lightColor;
     glm_vec3_copy((vec4) {1.0f, 1.0f, 0.9f, 1.0f}, lightColor);
     vec3 lightPos;
@@ -192,10 +120,6 @@ int main(int argc, char *argv[]) {
     mat4 pyramidModel = GLM_MAT4_IDENTITY_INIT;
     glm_translate(pyramidModel, pyramidPos);
 
-//    SHADERS_activate(lightShaderID);
-//    glUniformMatrix4fv(glGetUniformLocation(lightShaderID, "model"), 1, GL_FALSE, (float *) lightModel);
-//    glUniform4f(glGetUniformLocation(lightShaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
-//                lightColor[3]);
 
     // initialize the shader for the map
     SHADERS_activate(map_shaderID);
@@ -240,11 +164,6 @@ int main(int argc, char *argv[]) {
         MAP_GRAPHICS_draw_map_mesh(map_mesh_ptr, gameCamera);
         MESH_draw(test_mesh_ptr, gameCamera);
 
-//        MESH_draw(pyramidMesh, shaderID, gameCamera);
-//        MESH_draw(lightMesh, lightShaderID, gameCamera);
-
-        // TODO: put shader into mesh
-
         // Show next buffer
         glfwSwapBuffers(window);
 
@@ -257,27 +176,15 @@ int main(int argc, char *argv[]) {
     SHADERS_delete(mesh_shaderID);
     MAP_GRAPHICS_delete_map_mesh(map_mesh_ptr);
     MESH_delete(test_mesh_ptr);
-//    MESH_delete(pyramidMesh);
-//    SHADERS_delete(lightShaderID);
-//    MESH_delete(lightMesh);
 
     // This only works because there's only one texture
     TEXTURE_delete(*textures);
     CAMERA_delete(gameCamera);
 
-//    // Free static memory
-//    free(mapVertices->positions);
-//    free(mapVertices->normals);
-//    free(mapVertices->textUVs);
-//    free(mapVertices);
 
     // free the map
     Map_free(&main_map);
 
-//    free(lightVertices->positions);
-//    free(lightVertices->normals);
-//    free(lightVertices->textUVs);
-//    free(lightVertices);
 
     // Free window and free memory of window
     glfwDestroyWindow(window);
