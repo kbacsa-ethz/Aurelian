@@ -18,8 +18,8 @@
 //} Vertices;
 
 
-GLuint VBO_initialize(PositionsArray* positions_array_ptr, NormalsArray* normals_array_ptr,
-                      TextUVsArray* textUVs_array_ptr);
+GLuint VBO_initialize(PositionsArray positions_array, NormalsArray normals_array,
+                      TextUVsArray textUVs_array);
 int VBO_bind(GLuint ID);
 int VBO_unbind();
 int VBO_delete(GLuint ID);

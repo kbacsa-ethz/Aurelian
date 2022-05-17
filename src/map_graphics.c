@@ -6,6 +6,7 @@
 #include "map_graphics.h"
 //#include "mesh_array.h"
 
+// TODO: add the free of the EBO VBO VAO
 
 //////////////// Functions to fill the different arrays ////////////////
 
@@ -271,16 +272,15 @@ int MAP_GRAPHICS_get_map_mesh(MapMesh *map_mesh, Map map, GLuint shaderID, GLuin
     VAO_bind(map_mesh->VAO);
 
     // Create buffer object reference
-    map_mesh -> VBO = VBO_initialize(&(map_mesh->positions_array), &(map_mesh->normals_array),
-                                     &(map_mesh->textUVs_array));
+    map_mesh -> VBO = VBO_initialize(map_mesh->positions_array, map_mesh->normals_array,
+                                     map_mesh->textUVs_array);
 
     // Create index buffer object reference
-    map_mesh -> EBO = EBO_initialize(&(map_mesh->indices_array));
+    map_mesh -> EBO = EBO_initialize(map_mesh->indices_array);
 
-        // Links VBO to VAO
+    // Links VBO to VAO
     VAO_linkAttrib(map_mesh -> VBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void *) 0);
-    // Offset is half of total size (position + color) to go to color
-//    VAO_linkAttrib(mesh -> VBO, 1, 3, GL_FLOAT, 3 * sizeof(float), (void *)(mesh -> vertices -> sizePositions));
+
     // Normals
     VAO_linkAttrib(map_mesh -> VBO, 1, 3, GL_FLOAT, 3 * sizeof(float),
                    (void *)((map_mesh -> positions_array).size_positions));
@@ -304,14 +304,20 @@ int MAP_GRAPHICS_get_map_mesh(MapMesh *map_mesh, Map map, GLuint shaderID, GLuin
 
 // Functions to create the mesh
 
-int MAP_GRAPHICS_free_map_mesh(MapMesh *map_mesh_ptr) {
+int MAP_GRAPHICS_delete_map_mesh(MapMesh *map_mesh_ptr) {
     // free the arrays
     POSITIONS_ARRAY_free(&(map_mesh_ptr->positions_array));
     NORMALS_ARRAY_free(&(map_mesh_ptr->normals_array));
     TEXTUVS_ARRAY_free(&(map_mesh_ptr->textUVs_array));
     INDICES_ARRAY_free(&(map_mesh_ptr->indices_array));
 
-    // free the map mesh
+    //free the buffers
+    EBO_delete(map_mesh_ptr->EBO);
+    VBO_delete(map_mesh_ptr->VBO);
+    VAO_delete(map_mesh_ptr->VAO);
+
+    //free the map mesh
+    free(map_mesh_ptr);
 
     return 0;
     //
@@ -336,7 +342,6 @@ int MAP_GRAPHICS_draw_map_mesh(MapMesh *map_mesh_ptr, Camera *camera){
     // Primitive, index, number of vertices
     glDrawElements(GL_TRIANGLES, (map_mesh_ptr -> indices_array).size_indices / sizeof(GLuint), GL_UNSIGNED_INT, 0);
     return 0;
-
 }
 
 //SHADERS_activate(shaderID);

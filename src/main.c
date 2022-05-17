@@ -58,8 +58,35 @@ int main(int argc, char *argv[]) {
     // Select rendeing area
     glViewport(0, 0, WIDTH, HEIGHT);
 
-
+    // intialize the map
     Map main_map = MAP_BASIC_GENERATOR_get_sample_map(350, 350, -2.5f, -2.5f, 0.02f);
+
+    // initialize a test mesh
+    GLfloat test_mesh_positions[] = {-0.1f, 0.7f, 0.1f,
+                                     -0.1f, 0.7f, -0.1f,
+                                     0.1f, 0.7f, -0.1f,
+                                     -0.1f, 0.9f, 0.1f};
+
+    GLfloat test_mesh_normals[] = {-1.f, 0.f, 0.f,
+                                   0.f, -1.f, 0.f,
+                                   0.f, 0.f, -1.f,
+                                   1.f, 0.f, 0.f};
+
+    GLfloat test_mesh_textUVs[] = {1.f, 0.5f,
+                                   2.f, 0.6f,
+                                   9.f, 0.7f,
+                                   1.f, 1.f};
+
+    GLuint test_mesh_indices[] = {0, 1, 2, 0, 1, 3, 0, 2, 3, 1, 2, 3};
+
+    PositionsArray test_mesh_positions_array = {.positions_ptr=&test_mesh_positions,
+                                                .size_positions=sizeof(test_mesh_positions)};
+    NormalsArray test_mesh_normals_array = {.normals_ptr=&test_mesh_normals,
+                                            .size_normals=sizeof(test_mesh_normals)};
+    TextUVsArray test_mesh_textUVs_array = {.textUVs_ptr=&test_mesh_textUVs,
+                                            .size_textUVs=sizeof(test_mesh_textUVs)};
+    IndicesArray test_mesh_indices_array = {.indices_ptr=&test_mesh_indices,
+                                            .size_indices=sizeof(test_mesh_indices)};
 
 //    Vertices *mapVertices;
 //    mapVertices = (Vertices *) malloc(sizeof(Vertices));
@@ -124,15 +151,20 @@ int main(int argc, char *argv[]) {
 
     // Create shaders
     // Pass absolute path for now
-    GLuint shaderID = SHADERS_initialize("map.vert", "map.frag");
+    GLuint map_shaderID = SHADERS_initialize("map.vert", "map.frag");
+    GLuint mesh_shaderID = SHADERS_initialize("default.vert", "default.frag");
 
     // Initialize texture (read image into texture bank)
     int nTextures = 1;
     GLuint *textures = malloc(nTextures * sizeof(GLuint));
     *textures = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
-    MapMesh map_mesh;
-    MAP_GRAPHICS_get_map_mesh(&map_mesh, main_map, shaderID, textures, nTextures,0.5, 0.5);
+    MapMesh* map_mesh_ptr = malloc(sizeof(MapMesh));
+    MAP_GRAPHICS_get_map_mesh(map_mesh_ptr, main_map, map_shaderID, textures, nTextures,0.5, 0.5);
+
+    Mesh* test_mesh_ptr = malloc(sizeof(Mesh));
+    MESH_initialize(test_mesh_ptr, test_mesh_positions_array, test_mesh_normals_array, test_mesh_textUVs_array,
+                    test_mesh_indices_array, textures, nTextures, mesh_shaderID);
 
 //    Mesh *pyramidMesh = malloc(sizeof(Mesh));
 //    MESH_initialize(pyramidMesh, mapVertices, indices, textures, size_indices, nTextures);
@@ -165,11 +197,19 @@ int main(int argc, char *argv[]) {
 //    glUniform4f(glGetUniformLocation(lightShaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
 //                lightColor[3]);
 
-    SHADERS_activate(shaderID);
-    glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
-    glUniform4f(glGetUniformLocation(shaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
+    // initialize the shader for the map
+    SHADERS_activate(map_shaderID);
+    glUniformMatrix4fv(glGetUniformLocation(map_shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
+    glUniform4f(glGetUniformLocation(map_shaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
                 lightColor[3]);
-    glUniform3f(glGetUniformLocation(shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
+    glUniform3f(glGetUniformLocation(map_shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
+
+    // initialize the shader for the mesh
+    SHADERS_activate(mesh_shaderID);
+    glUniformMatrix4fv(glGetUniformLocation(mesh_shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
+    glUniform4f(glGetUniformLocation(mesh_shaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
+                lightColor[3]);
+    glUniform3f(glGetUniformLocation(mesh_shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
 
     // Enable depth testing (what to draw on top)
     glEnable(GL_DEPTH_TEST);
@@ -197,7 +237,8 @@ int main(int argc, char *argv[]) {
         CAMERA_inputs(gameCamera);
         CAMERA_updateMatrix(gameCamera, 45.0f, 0.1f, 100.0f);
 
-        MAP_GRAPHICS_draw_map_mesh(&map_mesh, gameCamera);
+        MAP_GRAPHICS_draw_map_mesh(map_mesh_ptr, gameCamera);
+        MESH_draw(test_mesh_ptr, gameCamera);
 
 //        MESH_draw(pyramidMesh, shaderID, gameCamera);
 //        MESH_draw(lightMesh, lightShaderID, gameCamera);
@@ -212,8 +253,10 @@ int main(int argc, char *argv[]) {
     }
 
     // Delete VAO, VBO, EBO and shaders and textures
-    SHADERS_delete(shaderID);
-    MAP_GRAPHICS_free_map_mesh(&map_mesh);
+    SHADERS_delete(map_shaderID);
+    SHADERS_delete(mesh_shaderID);
+    MAP_GRAPHICS_delete_map_mesh(map_mesh_ptr);
+    MESH_delete(test_mesh_ptr);
 //    MESH_delete(pyramidMesh);
 //    SHADERS_delete(lightShaderID);
 //    MESH_delete(lightMesh);

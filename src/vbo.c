@@ -1,7 +1,9 @@
 #include "vbo.h"
 
-GLuint VBO_initialize(PositionsArray* positions_array_ptr, NormalsArray* normals_array_ptr,
-                      TextUVsArray* textUVs_array_ptr){
+// TODO: Add pointer rather than pointer on pointers
+
+GLuint VBO_initialize(PositionsArray positions_array, NormalsArray normals_array,
+                      TextUVsArray textUVs_array){
 
     GLuint ID;
 
@@ -12,23 +14,23 @@ GLuint VBO_initialize(PositionsArray* positions_array_ptr, NormalsArray* normals
     glBindBuffer(GL_ARRAY_BUFFER, ID);
 
     // Load vertices (STATIC means that vertices cannot be modified)
-    size_t total_size = positions_array_ptr -> size_positions + normals_array_ptr -> size_normals +
-        textUVs_array_ptr -> size_textUVs;
+    size_t total_size = positions_array.size_positions + normals_array.size_normals +
+        textUVs_array.size_textUVs;
     glBufferData(GL_ARRAY_BUFFER, total_size, NULL, GL_STATIC_DRAW);
 
     // Load vertex data into sub-arrays
-    if (positions_array_ptr -> positions_ptr) {
-        glBufferSubData(GL_ARRAY_BUFFER, 0, positions_array_ptr->size_positions, positions_array_ptr -> positions_ptr);
+    if (positions_array.positions_ptr) {
+        glBufferSubData(GL_ARRAY_BUFFER, 0, positions_array.size_positions, positions_array.positions_ptr);
     }
 
-    if (normals_array_ptr ->normals_ptr) {
-        glBufferSubData(GL_ARRAY_BUFFER, positions_array_ptr->size_positions, normals_array_ptr -> size_normals,
-                        normals_array_ptr ->normals_ptr);
+    if (normals_array.normals_ptr) {
+        glBufferSubData(GL_ARRAY_BUFFER, positions_array.size_positions, normals_array.size_normals,
+                        normals_array.normals_ptr);
     }
 
-    if(textUVs_array_ptr->textUVs_ptr){
-        glBufferSubData(GL_ARRAY_BUFFER, positions_array_ptr->size_positions + normals_array_ptr -> size_normals,
-                        textUVs_array_ptr->size_textUVs, textUVs_array_ptr->textUVs_ptr);
+    if(textUVs_array.textUVs_ptr){
+        glBufferSubData(GL_ARRAY_BUFFER, positions_array.size_positions + normals_array.size_normals,
+                        textUVs_array.size_textUVs, textUVs_array.textUVs_ptr);
     }
 
     return ID;
