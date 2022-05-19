@@ -1,9 +1,6 @@
 #version 330 core
 out vec4 FragColor;
 
-// Color of vertex shader
-//in vec3 color;
-
 // Texture coordinates of vertex shader
 in vec2 texCoord;
 

@@ -17,6 +17,7 @@
 #include "mesh.h"
 #include "map.h"
 #include "map_basic_generator.h"
+#include "map_graphics.h"
 
 
 // Debuggig macros
@@ -57,92 +58,53 @@ int main(int argc, char *argv[]) {
     // Select rendeing area
     glViewport(0, 0, WIDTH, HEIGHT);
 
-
+    // intialize the map
     Map main_map = MAP_BASIC_GENERATOR_get_sample_map(350, 350, -2.5f, -2.5f, 0.02f);
 
-    Vertices *mapVertices;
-    mapVertices = (Vertices *) malloc(sizeof(Vertices));
+    // initialize a test mesh
+    GLfloat test_mesh_positions[] = {-0.1f, 0.7f, 0.1f,
+                                     -0.1f, 0.7f, -0.1f,
+                                     0.1f, 0.7f, -0.1f,
+                                     -0.1f, 0.9f, 0.1f};
 
-    mapVertices->positions = MAP_get_positions(main_map);
-    mapVertices->sizePositions = MAP_get_positions_size(main_map);
+    GLfloat test_mesh_normals[] = {-1.f, 0.f, 0.f,
+                                   0.f, -1.f, 0.f,
+                                   0.f, 0.f, -1.f,
+                                   1.f, 0.f, 0.f};
 
-    mapVertices->normals = MAP_get_normals(main_map);
-    mapVertices->sizeNormals = MAP_get_normals_size(main_map);
+    GLfloat test_mesh_textUVs[] = {1.f, 0.5f,
+                                   2.f, 0.6f,
+                                   9.f, 0.7f,
+                                   1.f, 1.f};
 
-    mapVertices->textUVs = MAP_get_text_uvs(main_map, 0.5, 0.5);
-    mapVertices->sizeTextUVs = MAP_get_text_uvs_size(main_map);
+    GLuint test_mesh_indices[] = {0, 1, 2, 0, 1, 3, 0, 2, 3, 1, 2, 3};
 
-    mapVertices->colors = MAP_get_colors(main_map);
-    mapVertices->sizeColors = MAP_get_colors_size(main_map);
+    PositionsArray test_mesh_positions_array = {.positions_ptr=&test_mesh_positions,
+                                                .size_positions=sizeof(test_mesh_positions)};
+    NormalsArray test_mesh_normals_array = {.normals_ptr=&test_mesh_normals,
+                                            .size_normals=sizeof(test_mesh_normals)};
+    TextUVsArray test_mesh_textUVs_array = {.textUVs_ptr=&test_mesh_textUVs,
+                                            .size_textUVs=sizeof(test_mesh_textUVs)};
+    IndicesArray test_mesh_indices_array = {.indices_ptr=&test_mesh_indices,
+                                            .size_indices=sizeof(test_mesh_indices)};
 
-
-    GLuint *indices = MAP_get_indices(main_map);
-    size_t size_indices = MAP_get_indices_size(main_map);
-
-    // Light source (cube)
-    GLfloat lightPositions[] =
-        { //     COORDINATES     //
-            -0.1f, 0.7f, 0.1f,
-            -0.1f, 0.7f, -0.1f,
-            0.1f, 0.7f, -0.1f,
-            0.1f, 0.7f, 0.1f,
-            -0.1f, 0.9f, 0.1f,
-            -0.1f, 0.9f, -0.1f,
-            0.1f, 0.9f, -0.1f,
-            0.1f, 0.9f, 0.1f
-        };
-
-    GLuint lightIndices[] =
-        {
-            0, 1, 2,
-            0, 2, 3,
-            0, 4, 7,
-            0, 7, 3,
-            3, 7, 6,
-            3, 6, 2,
-            2, 6, 5,
-            2, 5, 1,
-            1, 5, 4,
-            1, 4, 0,
-            4, 5, 6,
-            4, 6, 7
-        };
-
-    Vertices *lightVertices;
-    lightVertices = (Vertices *) malloc(sizeof(Vertices));
-    lightVertices->positions = malloc(8 * 3 * sizeof(float));
-    for (int i = 0; i < 8; i++) {
-        *(lightVertices->positions + 3 * i) = lightPositions[3 * i];
-        *(lightVertices->positions + 3 * i + 1) = lightPositions[3 * i + 1];
-        *(lightVertices->positions + 3 * i + 2) = lightPositions[3 * i + 2];
-    }
-
-    lightVertices->colors = NULL;
-    lightVertices->normals = NULL;
-    lightVertices->textUVs = NULL;
-
-    lightVertices->sizePositions = 8 * 3 * sizeof(float);
-    lightVertices->sizeColors = 0;
-    lightVertices->sizeNormals = 0;
-    lightVertices->sizeTextUVs = 0;
 
     // Create shaders
     // Pass absolute path for now
-    GLuint shaderID = SHADERS_initialize("default.vert", "default.frag");
+    GLuint map_shaderID = SHADERS_initialize("map.vert", "map.frag");
+    GLuint mesh_shaderID = SHADERS_initialize("default.vert", "default.frag");
 
     // Initialize texture (read image into texture bank)
     int nTextures = 1;
     GLuint *textures = malloc(nTextures * sizeof(GLuint));
     *textures = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
-    Mesh *pyramidMesh = malloc(sizeof(Mesh));
-    MESH_initialize(pyramidMesh, mapVertices, indices, textures, MAP_get_indices_size(main_map), nTextures);
+    MapMesh* map_mesh_ptr = malloc(sizeof(MapMesh));
+    MAP_GRAPHICS_get_map_mesh(map_mesh_ptr, main_map, map_shaderID, textures, nTextures,0.5, 0.5);
 
-    // Shader for light cube
-    GLuint lightShaderID = SHADERS_initialize("light.vert", "light.frag");
-
-    Mesh *lightMesh = malloc(sizeof(Mesh));
-    MESH_initialize(lightMesh, lightVertices, lightIndices, textures, sizeof(lightIndices), 0);
+    Mesh* test_mesh_ptr = malloc(sizeof(Mesh));
+    MESH_initialize(test_mesh_ptr, test_mesh_positions_array, test_mesh_normals_array, test_mesh_textUVs_array,
+                    test_mesh_indices_array, textures, nTextures, mesh_shaderID);
 
     vec4 lightColor;
     glm_vec3_copy((vec4) {1.0f, 1.0f, 0.9f, 1.0f}, lightColor);
@@ -153,19 +115,25 @@ int main(int argc, char *argv[]) {
 
     vec3 pyramidPos;
     glm_vec3_copy((vec3) {0.5f, 0.5f, 0.5f}, pyramidPos);
+
+
     mat4 pyramidModel = GLM_MAT4_IDENTITY_INIT;
     glm_translate(pyramidModel, pyramidPos);
 
-    SHADERS_activate(lightShaderID);
-    glUniformMatrix4fv(glGetUniformLocation(lightShaderID, "model"), 1, GL_FALSE, (float *) lightModel);
-    glUniform4f(glGetUniformLocation(lightShaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
-                lightColor[3]);
 
-    SHADERS_activate(shaderID);
-    glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
-    glUniform4f(glGetUniformLocation(shaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
+    // initialize the shader for the map
+    SHADERS_activate(map_shaderID);
+    glUniformMatrix4fv(glGetUniformLocation(map_shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
+    glUniform4f(glGetUniformLocation(map_shaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
                 lightColor[3]);
-    glUniform3f(glGetUniformLocation(shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
+    glUniform3f(glGetUniformLocation(map_shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
+
+    // initialize the shader for the mesh
+    SHADERS_activate(mesh_shaderID);
+    glUniformMatrix4fv(glGetUniformLocation(mesh_shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
+    glUniform4f(glGetUniformLocation(mesh_shaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
+                lightColor[3]);
+    glUniform3f(glGetUniformLocation(mesh_shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
 
     // Enable depth testing (what to draw on top)
     glEnable(GL_DEPTH_TEST);
@@ -193,8 +161,8 @@ int main(int argc, char *argv[]) {
         CAMERA_inputs(gameCamera);
         CAMERA_updateMatrix(gameCamera, 45.0f, 0.1f, 100.0f);
 
-        MESH_draw(pyramidMesh, shaderID, gameCamera);
-        MESH_draw(lightMesh, lightShaderID, gameCamera);
+        MAP_GRAPHICS_draw_map_mesh(map_mesh_ptr, gameCamera);
+        MESH_draw(test_mesh_ptr, gameCamera);
 
         // Show next buffer
         glfwSwapBuffers(window);
@@ -204,30 +172,19 @@ int main(int argc, char *argv[]) {
     }
 
     // Delete VAO, VBO, EBO and shaders and textures
-    SHADERS_delete(shaderID);
-    MESH_delete(pyramidMesh);
-    SHADERS_delete(lightShaderID);
-    MESH_delete(lightMesh);
+    SHADERS_delete(map_shaderID);
+    SHADERS_delete(mesh_shaderID);
+    MAP_GRAPHICS_delete_map_mesh(map_mesh_ptr);
+    MESH_delete(test_mesh_ptr);
 
     // This only works because there's only one texture
     TEXTURE_delete(*textures);
     CAMERA_delete(gameCamera);
 
-    // Free static memory
-    free(mapVertices->positions);
-    free(mapVertices->colors);
-    free(mapVertices->normals);
-    free(mapVertices->textUVs);
-    free(mapVertices);
 
     // free the map
     Map_free(&main_map);
 
-    free(lightVertices->positions);
-    free(lightVertices->colors);
-    free(lightVertices->normals);
-    free(lightVertices->textUVs);
-    free(lightVertices);
 
     // Free window and free memory of window
     glfwDestroyWindow(window);

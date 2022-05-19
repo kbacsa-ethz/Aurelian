@@ -4,21 +4,11 @@
 #include <glad/glad.h>
 #include <cglm/cglm.h>
 
-// reformat to DoD
-
-typedef struct {
-    GLfloat *positions;
-    GLfloat *colors;
-    GLfloat *normals;
-    GLfloat *textUVs;
-    size_t sizePositions;
-    size_t sizeColors;
-    size_t sizeNormals;
-    size_t sizeTextUVs;
-} Vertices;
+# include "mesh_array.h"
 
 
-GLuint VBO_initialize(Vertices *vertices);
+GLuint VBO_initialize(PositionsArray positions_array, NormalsArray normals_array,
+                      TextUVsArray textUVs_array);
 int VBO_bind(GLuint ID);
 int VBO_unbind();
 int VBO_delete(GLuint ID);
