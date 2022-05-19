@@ -1,8 +1,6 @@
 #include "ebo.h"
 
-// TODO: add pointer rather than a pointer of pointers
-
-GLuint EBO_initialize(IndicesArray indices_array){
+GLuint EBO_initialize(GLuint *indices, GLsizeiptr size) {
 
     GLuint ID;
 
@@ -13,8 +11,7 @@ GLuint EBO_initialize(IndicesArray indices_array){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ID);
 
     // Load vertices (STATIC means that vertices cannot be modified)
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_array.size_indices, indices_array.indices_ptr,
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
 
     return ID;
 }

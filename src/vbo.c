@@ -1,9 +1,7 @@
 #include "vbo.h"
 
-// TODO: Add pointer rather than pointer on pointers
 
-GLuint VBO_initialize(PositionsArray positions_array, NormalsArray normals_array,
-                      TextUVsArray textUVs_array){
+GLuint VBO_initialize(Vertices *vertices) {
 
     GLuint ID;
 
@@ -14,27 +12,28 @@ GLuint VBO_initialize(PositionsArray positions_array, NormalsArray normals_array
     glBindBuffer(GL_ARRAY_BUFFER, ID);
 
     // Load vertices (STATIC means that vertices cannot be modified)
-    size_t total_size = positions_array.size_positions + normals_array.size_normals +
-        textUVs_array.size_textUVs;
-    glBufferData(GL_ARRAY_BUFFER, total_size, NULL, GL_STATIC_DRAW);
+    size_t totalSize = vertices -> sizePositions + vertices -> sizeColors + vertices -> sizeNormals + vertices -> sizeTextUVs;
+    glBufferData(GL_ARRAY_BUFFER, totalSize, NULL, GL_STATIC_DRAW);
 
     // Load vertex data into sub-arrays
-    if (positions_array.positions_ptr) {
-        glBufferSubData(GL_ARRAY_BUFFER, 0, positions_array.size_positions, positions_array.positions_ptr);
+    if (vertices -> positions) {
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices -> sizePositions, vertices -> positions);
+    }
+    // TODO Raise error if no positions provided ?
+
+    if (vertices -> colors) {
+        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions, vertices -> sizeColors, vertices -> colors);
     }
 
-    if (normals_array.normals_ptr) {
-        glBufferSubData(GL_ARRAY_BUFFER, positions_array.size_positions, normals_array.size_normals,
-                        normals_array.normals_ptr);
+    if (vertices -> normals) {
+        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions + vertices -> sizeColors, vertices -> sizeNormals, vertices -> normals);
     }
 
-    if(textUVs_array.textUVs_ptr){
-        glBufferSubData(GL_ARRAY_BUFFER, positions_array.size_positions + normals_array.size_normals,
-                        textUVs_array.size_textUVs, textUVs_array.textUVs_ptr);
+    if (vertices -> textUVs) {
+        glBufferSubData(GL_ARRAY_BUFFER, vertices -> sizePositions + vertices -> sizeColors + vertices -> sizeNormals, vertices -> sizeTextUVs, vertices -> textUVs);
     }
 
     return ID;
-
 }
 
 int VBO_bind(GLuint ID) {
