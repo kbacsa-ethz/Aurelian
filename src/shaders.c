@@ -35,8 +35,8 @@ GLuint SHADERS_initialize(char *vertexFilename, char *fragmentFilename) {
     char *fragmentShaderSource = SHADERS_readfile(fragmentFilename);
 
     // ADD CONDITION IF NULL THEN QUIT
-    printf("vertexShaderSource = %s\n", vertexShaderSource);
-    printf("fragmentShaderSource = %s\n", fragmentShaderSource);
+    // printf("vertexShaderSource = %s\n", vertexShaderSource);
+    // printf("fragmentShaderSource = %s\n", fragmentShaderSource);
 
     // Create vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
