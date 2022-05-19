@@ -327,12 +327,12 @@ int MAP_GRAPHICS_draw_map_mesh(MapMesh *map_mesh_ptr, Camera *camera){
 
     VAO_bind(map_mesh_ptr -> VAO);
 
-        for (unsigned int i = 0; i < map_mesh_ptr -> nTextures; i++) {
+    char buf[50];
+    for (unsigned int i = 0; i < map_mesh_ptr -> nTextures; i++) {
         // Activate uniform (mapping function)
-        char string[4];
-        snprintf(string, 4, "tex%d", i);
-        TEXTURE_texUnit(map_mesh_ptr -> shaderID, "tex0", i);
-        TEXTURE_bind(GL_TEXTURE_2D, *(map_mesh_ptr -> textureIDs_ptr+i)); // bind to texture reference
+        snprintf(buf, 50, "tex%d", i);
+        TEXTURE_texUnit(map_mesh_ptr -> shaderID, buf, i);
+        TEXTURE_bind(GL_TEXTURE_2D, *(map_mesh_ptr -> textureIDs_ptr+i), i); // bind to texture reference
     }
 
         // Camera orientation and projection

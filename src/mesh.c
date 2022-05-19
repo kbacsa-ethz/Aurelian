@@ -54,7 +54,7 @@ int MESH_draw(Mesh *mesh_ptr, Camera *camera){
     VAO_bind(mesh_ptr -> VAO);
 
     char buf[50];
-    for (unsigned int i = 0; i < mesh -> nTextures; i++) {
+    for (unsigned int i = 0; i < mesh_ptr -> nTextures; i++) {
         // Activate uniform (mapping function)
         snprintf(buf, 50, "tex%d", i);
         TEXTURE_texUnit(mesh_ptr -> shaderID, buf, i);
