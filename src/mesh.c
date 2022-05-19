@@ -53,12 +53,12 @@ int MESH_draw(Mesh *mesh_ptr, Camera *camera){
 
     VAO_bind(mesh_ptr -> VAO);
 
-    for (unsigned int i = 0; i < mesh_ptr -> nTextures; i++) {
+    char buf[50];
+    for (unsigned int i = 0; i < mesh -> nTextures; i++) {
         // Activate uniform (mapping function)
-        char string[4];
-        snprintf(string, 4, "tex%d", i);
-        TEXTURE_texUnit(mesh_ptr -> shaderID, "tex0", i);
-        TEXTURE_bind(GL_TEXTURE_2D, *(mesh_ptr -> textureIDs_ptr+i)); // bind to texture reference
+        snprintf(buf, 50, "tex%d", i);
+        TEXTURE_texUnit(mesh_ptr -> shaderID, buf, i);
+        TEXTURE_bind(GL_TEXTURE_2D, *(mesh_ptr -> textureIDs_ptr+i), i); // bind to texture reference
     }
 
     // Camera orientation and projection

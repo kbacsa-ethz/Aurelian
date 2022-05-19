@@ -3,12 +3,12 @@
 #include "shaders.h"
 
 
-GLuint TEXTURE_initialize(const char *image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType) {
+GLuint TEXTURE_initialize(const char *image, GLenum texType, GLuint slot, GLenum format, GLenum pixelType) {
 
     GLuint ID;
     // Generate textures (number of pictures, reference)
     glGenTextures(1, &ID);
-    glActiveTexture(slot); // activate texture "bank"
+    glActiveTexture(GL_TEXTURE0 + slot); // activate texture "bank"
     glBindTexture(texType, ID); // bind to texture reference
 
     // Choose type of interpolation (here use linear interpolation)
@@ -25,13 +25,11 @@ GLuint TEXTURE_initialize(const char *image, GLenum texType, GLenum slot, GLenum
     // Loads image into character array
     unsigned char *bytes = stbi_load(image, &widthImg, &heightImg, &numColCh, 0);
 
-    if (bytes)
-    {
+    if (bytes) {
         glTexImage2D(texType, 0, GL_RGB, widthImg, heightImg, 0, format, pixelType, bytes);
         glGenerateMipmap(texType);
     }
-    else
-    {
+    else {
         printf("Failed to load texture.\n");
     }
 
@@ -47,13 +45,14 @@ GLuint TEXTURE_initialize(const char *image, GLenum texType, GLenum slot, GLenum
 
 int TEXTURE_texUnit(GLuint shaderID, const char *uniform, GLuint unit) {
     // Use texture uniform
-    GLuint tex0Uniform = glGetUniformLocation(shaderID, uniform);
+    GLuint texUniform = glGetUniformLocation(shaderID, uniform);
     SHADERS_activate(shaderID);
-    glUniform1i(tex0Uniform, unit);
+    glUniform1i(texUniform, unit);
     return 0;
 }
 
-int TEXTURE_bind(GLenum texType, GLuint ID) {
+int TEXTURE_bind(GLenum texType, GLuint ID, GLuint unit) {
+    glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(texType, ID);
     return 0;
 }
