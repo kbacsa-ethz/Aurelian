@@ -2,3 +2,6 @@
 	path = cglm
 	url = git@github.com:recp/cglm.git
     branch = master
+[submodule "cJSON"]
+	path = cJSON
+	url = https://github.com/DaveGamble/cJSON.git

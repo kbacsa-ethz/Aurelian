@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     glViewport(0, 0, WIDTH, HEIGHT);
 
     // intialize the map
-    Map main_map = MAP_BASIC_GENERATOR_get_sample_map(350, 350, -2.5f, -2.5f, 0.02f);
+    Map main_map = MAP_BASIC_GENERATOR_get_sample_map(120, 120, -2.5f, -2.5f, 0.06f);
 
     // initialize a test mesh
     GLfloat test_mesh_positions[] = {-0.1f, 0.7f, 0.1f,

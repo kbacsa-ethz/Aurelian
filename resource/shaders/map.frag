@@ -2,7 +2,7 @@
 out vec4 FragColor;
 
 // Color of vertex shader
-in vec3 color;
+//in vec3 color;
 
 // Texture coordinates of vertex shader
 in vec2 texCoord;
@@ -42,4 +42,5 @@ void main()
     float specular = specAmount * specularLight;
 
     FragColor = (texture(tex0, texCoord) * (diffuse + ambient) + texture(tex1, texCoord).r * specular) * lightColor;
+//    FragColor = (texture(tex0, texCoord) * (diffuse + ambient)) * lightColor;
 }
