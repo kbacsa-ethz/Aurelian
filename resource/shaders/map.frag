@@ -1,12 +1,6 @@
 #version 330 core
 out vec4 FragColor;
 
-// Color of vertex shader
-//in vec3 color;
-
-// Texture coordinates of vertex shader
-//in vec2 texCoord;
-
 // Imports normals
 in vec3 Normal;
 
@@ -44,9 +38,6 @@ void main()
     float specular = specAmount * specularLight;
 
     vec2 texCoordLocal = crntPos.xz / texSizeVal;
-//    texCoordLocal[0] = mod(crntPos.x, texModuloVal[0]);
-//    texCoordLocal[1] = mod(crntPos.z, texModuloVal[1]);
-
 
     FragColor = (texture(tex0, texCoordLocal) * (diffuse + ambient) + texture(tex1, texCoordLocal).r * specular) * lightColor;
 //    FragColor = (texture(tex0, texCoord) * (diffuse + ambient)) * lightColor;

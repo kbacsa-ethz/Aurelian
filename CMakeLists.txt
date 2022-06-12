@@ -15,6 +15,7 @@ link_libraries(OpenGL::GL)
 link_libraries(glfw)
 
 include_directories(include)
+include_directories(${PROJECT_SOURCE_DIR}/cJSON)
 
 file(GLOB SOURCES
         include/*.h

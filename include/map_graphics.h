@@ -17,7 +17,6 @@
 struct MapMeshStruct{
     PositionsArray positions_array;
     NormalsArray normals_array;
-//    TextUVsArray textUVs_array;
     IndicesArray indices_array;
 
     GLuint *textureIDs_ptr;
