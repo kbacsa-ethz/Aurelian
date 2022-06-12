@@ -89,9 +89,12 @@ int main(int argc, char *argv[]) {
                                             .size_indices=sizeof(test_mesh_indices)};
 
 
+
+
     // Create shaders
     // Pass absolute path for now
     GLuint map_shaderID = SHADERS_initialize("map.vert", "map.frag");
+
     GLuint mesh_shaderID = SHADERS_initialize("default.vert", "default.frag");
 
     // Initialize texture (read image into texture bank)
@@ -122,6 +125,7 @@ int main(int argc, char *argv[]) {
     glm_translate(pyramidModel, pyramidPos);
 
 
+
     // initialize the shader for the map
     SHADERS_activate(map_shaderID);
     glUniformMatrix4fv(glGetUniformLocation(map_shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
@@ -129,12 +133,18 @@ int main(int argc, char *argv[]) {
                 lightColor[3]);
     glUniform3f(glGetUniformLocation(map_shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
 
+    // add the modulo for the map texture
+    glUniform2f(glGetUniformLocation(map_shaderID, "texSizeVal"), 0.2f, 0.2f);
+
     // initialize the shader for the mesh
     SHADERS_activate(mesh_shaderID);
     glUniformMatrix4fv(glGetUniformLocation(mesh_shaderID, "model"), 1, GL_FALSE, (float *) pyramidModel);
     glUniform4f(glGetUniformLocation(mesh_shaderID, "lightColor"), lightColor[0], lightColor[1], lightColor[2],
                 lightColor[3]);
     glUniform3f(glGetUniformLocation(mesh_shaderID, "lightPos"), lightPos[0], lightPos[1], lightPos[2]);
+
+
+
 
     // Enable depth testing (what to draw on top)
     glEnable(GL_DEPTH_TEST);

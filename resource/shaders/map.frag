@@ -21,6 +21,8 @@ uniform vec4 lightColor;
 uniform vec3 lightPos;
 uniform vec3 camPos;
 
+uniform vec2 texSizeVal;
+
 void main()
 {
     float ambient = 0.05f;
@@ -41,6 +43,11 @@ void main()
     float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 8);
     float specular = specAmount * specularLight;
 
-    FragColor = (texture(tex0, texCoord) * (diffuse + ambient) + texture(tex1, texCoord).r * specular) * lightColor;
+    vec2 texCoordLocal = crntPos.xz / texSizeVal;
+//    texCoordLocal[0] = mod(crntPos.x, texModuloVal[0]);
+//    texCoordLocal[1] = mod(crntPos.z, texModuloVal[1]);
+
+
+    FragColor = (texture(tex0, texCoordLocal) * (diffuse + ambient) + texture(tex1, texCoordLocal).r * specular) * lightColor;
 //    FragColor = (texture(tex0, texCoord) * (diffuse + ambient)) * lightColor;
 }

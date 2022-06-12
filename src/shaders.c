@@ -47,6 +47,7 @@ GLuint SHADERS_initialize(char *vertexFilename, char *fragmentFilename) {
      // Compile source that was just passed
     glCompileShader(vertexShader);
 
+
     // Check error log
     SHADERS_compileErrors(vertexShader, "VERTEX");
 
@@ -98,4 +99,6 @@ int SHADERS_compileErrors(unsigned int shader, const char *type) {
             printf("SHADER_LINKING_ERROR for: %s at %d\n", type, shader);
         }
     }
+
+    return 0;
 }
