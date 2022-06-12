@@ -158,7 +158,7 @@ int MAP_GRAPHICS_compute_normals(NormalsArray *normals_array_ptr, Map map) {
 }
 
 
-// get the text UV map
+/*// get the text UV map
 int MAP_GRAPHICS_compute_textUVs(TextUVsArray *textUVs_array_ptr, Map map, double uv_max_x, double uv_max_z) {
 
     // compute the full size of the array
@@ -188,7 +188,7 @@ int MAP_GRAPHICS_compute_textUVs(TextUVsArray *textUVs_array_ptr, Map map, doubl
 
     return 0;
 
-}
+}*/
 
 // get the indices of the map
 int MAP_GRAPHICS_compute_indices(IndicesArray *indices_array_ptr, Map map) {
@@ -256,13 +256,12 @@ int MAP_GRAPHICS_compute_indices(IndicesArray *indices_array_ptr, Map map) {
 
 //////////////// Functions to handle the mesh ////////////////
 
-int MAP_GRAPHICS_get_map_mesh(MapMesh *map_mesh, Map map, GLuint shaderID, GLuint *textureIDs, int nTextures,
-                              double uv_max_x, double uv_max_z) {
+int MAP_GRAPHICS_get_map_mesh(MapMesh *map_mesh, Map map, GLuint shaderID, GLuint *textureIDs, int nTextures) {
 
     // initialize the mesh
     MAP_GRAPHICS_compute_positions(&(map_mesh->positions_array), map);
     MAP_GRAPHICS_compute_normals(&(map_mesh->normals_array), map);
-    MAP_GRAPHICS_compute_textUVs(&(map_mesh->textUVs_array), map, uv_max_x, uv_max_z);
+//    MAP_GRAPHICS_compute_textUVs(&(map_mesh->textUVs_array), map, uv_max_x, uv_max_z);
     MAP_GRAPHICS_compute_indices(&(map_mesh->indices_array), map);
 
     // bind with the buffers
@@ -272,8 +271,9 @@ int MAP_GRAPHICS_get_map_mesh(MapMesh *map_mesh, Map map, GLuint shaderID, GLuin
     VAO_bind(map_mesh->VAO);
 
     // Create buffer object reference
-    map_mesh -> VBO = VBO_initialize(map_mesh->positions_array, map_mesh->normals_array,
-                                     map_mesh->textUVs_array);
+//    map_mesh -> VBO = VBO_initialize_Positions_Normals_TextUVs(map_mesh->positions_array, map_mesh->normals_array,
+//                                     map_mesh->textUVs_array);
+    map_mesh -> VBO = VBO_initialize_Positions_Normals(map_mesh->positions_array, map_mesh->normals_array);
 
     // Create index buffer object reference
     map_mesh -> EBO = EBO_initialize(map_mesh->indices_array);
@@ -284,10 +284,10 @@ int MAP_GRAPHICS_get_map_mesh(MapMesh *map_mesh, Map map, GLuint shaderID, GLuin
     // Normals
     VAO_linkAttrib(map_mesh -> VBO, 1, 3, GL_FLOAT, 3 * sizeof(float),
                    (void *)((map_mesh -> positions_array).size_positions));
-    // Texture coordinates
-    VAO_linkAttrib(map_mesh -> VBO, 2, 2, GL_FLOAT, 2 * sizeof(float),
-                   (void *)(((map_mesh -> positions_array).size_positions) +
-                       ((map_mesh -> normals_array).size_normals)));
+//    // Texture coordinates
+//    VAO_linkAttrib(map_mesh -> VBO, 2, 2, GL_FLOAT, 2 * sizeof(float),
+//                   (void *)(((map_mesh -> positions_array).size_positions) +
+//                       ((map_mesh -> normals_array).size_normals)));
 
     VAO_unbind();
     VBO_unbind();
@@ -308,7 +308,7 @@ int MAP_GRAPHICS_delete_map_mesh(MapMesh *map_mesh_ptr) {
     // free the arrays
     POSITIONS_ARRAY_free(&(map_mesh_ptr->positions_array));
     NORMALS_ARRAY_free(&(map_mesh_ptr->normals_array));
-    TEXTUVS_ARRAY_free(&(map_mesh_ptr->textUVs_array));
+//    TEXTUVS_ARRAY_free(&(map_mesh_ptr->textUVs_array));
     INDICES_ARRAY_free(&(map_mesh_ptr->indices_array));
 
     //free the buffers

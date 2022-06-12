@@ -5,7 +5,7 @@ out vec4 FragColor;
 //in vec3 color;
 
 // Texture coordinates of vertex shader
-in vec2 texCoord;
+//in vec2 texCoord;
 
 // Imports normals
 in vec3 Normal;

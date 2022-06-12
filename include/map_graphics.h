@@ -17,7 +17,7 @@
 struct MapMeshStruct{
     PositionsArray positions_array;
     NormalsArray normals_array;
-    TextUVsArray textUVs_array;
+//    TextUVsArray textUVs_array;
     IndicesArray indices_array;
 
     GLuint *textureIDs_ptr;
@@ -32,8 +32,7 @@ struct MapMeshStruct{
 typedef struct MapMeshStruct MapMesh;
 
 
-int MAP_GRAPHICS_get_map_mesh(MapMesh* map_mesh, Map map, GLuint shaderID, GLuint *textureIDs, int nTextures,
-                              double uv_max_x, double uv_max_z);
+int MAP_GRAPHICS_get_map_mesh(MapMesh* map_mesh, Map map, GLuint shaderID, GLuint *textureIDs, int nTextures);
 int MAP_GRAPHICS_delete_map_mesh(MapMesh *map_mesh_ptr);
 
 int MAP_GRAPHICS_draw_map_mesh(MapMesh *map_mesh_ptr, Camera *camera);

@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     *(textures + 1) = TEXTURE_initialize("lennaSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
 
     MapMesh* map_mesh_ptr = malloc(sizeof(MapMesh));
-    MAP_GRAPHICS_get_map_mesh(map_mesh_ptr, main_map, map_shaderID, textures, nTextures,0.5, 0.5);
+    MAP_GRAPHICS_get_map_mesh(map_mesh_ptr, main_map, map_shaderID, textures, nTextures);
 
     Mesh* test_mesh_ptr = malloc(sizeof(Mesh));
     MESH_initialize(test_mesh_ptr, test_mesh_positions_array, test_mesh_normals_array, test_mesh_textUVs_array,

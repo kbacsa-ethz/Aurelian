@@ -6,9 +6,9 @@
 
 # include "mesh_array.h"
 
-
-GLuint VBO_initialize(PositionsArray positions_array, NormalsArray normals_array,
-                      TextUVsArray textUVs_array);
+GLuint VBO_initialize_Positions_Normals(PositionsArray positions_array, NormalsArray normals_array);
+GLuint VBO_initialize_Positions_Normals_TextUVs(PositionsArray positions_array, NormalsArray normals_array,
+                                                TextUVsArray textUVs_array);
 int VBO_bind(GLuint ID);
 int VBO_unbind();
 int VBO_delete(GLuint ID);

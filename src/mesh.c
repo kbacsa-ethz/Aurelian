@@ -27,7 +27,7 @@ int MESH_initialize(Mesh *mesh, PositionsArray positions_array, NormalsArray nor
     VAO_bind(mesh -> VAO);
 
     // Create buffer object reference
-    mesh -> VBO = VBO_initialize(mesh->positions_array, mesh->normals_array,
+    mesh -> VBO = VBO_initialize_Positions_Normals_TextUVs(mesh->positions_array, mesh->normals_array,
                                  mesh->textUVs_array);
 
     // Create index buffer object reference
