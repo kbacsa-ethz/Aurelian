@@ -100,8 +100,8 @@ int main(int argc, char *argv[]) {
     // Initialize texture (read image into texture bank)
     int nTextures = 2;
     GLuint *textures = malloc(nTextures * sizeof(GLuint));
-    *textures = TEXTURE_initialize("lenna.png", GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE);
-    *(textures + 1) = TEXTURE_initialize("lennaSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
+    *textures = TEXTURE_initialize("forest.png", GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE);
+    *(textures + 1) = TEXTURE_initialize("forest_lapl.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
 
     MapMesh* map_mesh_ptr = malloc(sizeof(MapMesh));
     MAP_GRAPHICS_get_map_mesh(map_mesh_ptr, main_map, map_shaderID, textures, nTextures);
