@@ -15,6 +15,7 @@
 #include "texture.h"
 #include "camera.h"
 #include "mesh.h"
+#include "model.h"
 #include "map.h"
 #include "map_basic_generator.h"
 #include "map_graphics.h"
@@ -150,6 +151,11 @@ int main(int argc, char *argv[]) {
     // This function allows us to pass data from the callback
     glfwSetWindowUserPointer(window, gameCamera);
 
+    // DEBUG: stub input matrix and model
+    mat4 inputMatrix = GLM_MAT4_IDENTITY_INIT;
+    Model *lanternModel = malloc(sizeof(Model));
+    MODEL_initialize(lanternModel);
+
     // Event loop
     while (!glfwWindowShouldClose(window)) {
 
@@ -162,7 +168,8 @@ int main(int argc, char *argv[]) {
         CAMERA_inputs(gameCamera);
         CAMERA_updateMatrix(gameCamera, 45.0f, 0.1f, 100.0f);
 
-        MAP_GRAPHICS_draw_map_mesh(map_mesh_ptr, gameCamera);
+        //MAP_GRAPHICS_draw_map_mesh(map_mesh_ptr, gameCamera);
+        MODEL_traverseNode(lanternModel, 0, inputMatrix);
         MESH_draw(test_mesh_ptr, gameCamera);
 
         // Show next buffer
@@ -177,6 +184,7 @@ int main(int argc, char *argv[]) {
     SHADERS_delete(mesh_shaderID);
     MAP_GRAPHICS_delete_map_mesh(map_mesh_ptr);
     MESH_delete(test_mesh_ptr);
+    MODEL_delete(lanternModel);
 
     // This only works because there's only one texture
     TEXTURE_delete(*textures);
@@ -185,7 +193,6 @@ int main(int argc, char *argv[]) {
 
     // free the map
     Map_free(&main_map);
-
 
     // Free window and free memory of window
     glfwDestroyWindow(window);

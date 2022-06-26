@@ -22,7 +22,7 @@ file(GLOB SOURCES
         src/*.c
         )
 
-file(GLOB RES_FILES resource/shaders/*.frag resource/shaders/*.vert resource/textures/*)
+file(GLOB RES_FILES resource/shaders/* resource/textures/* resource/glTF/*)
 
 file(COPY ${RES_FILES}
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
