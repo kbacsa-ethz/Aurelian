@@ -88,7 +88,8 @@ int main(int argc, char *argv[]) {
     IndicesArray test_mesh_indices_array = {.indices_ptr=&test_mesh_indices,
                                             .size_indices=sizeof(test_mesh_indices)};
 
-
+    // create a dummy buffer
+    GLuint dummy_buffer = VBO_initialize_Positions(test_mesh_positions_array);
 
 
     // Create shaders

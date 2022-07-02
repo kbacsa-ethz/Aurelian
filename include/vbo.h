@@ -6,6 +6,7 @@
 
 # include "mesh_array.h"
 
+GLuint VBO_initialize_Positions(PositionsArray positions_array);
 GLuint VBO_initialize_Positions_Normals(PositionsArray positions_array, NormalsArray normals_array);
 GLuint VBO_initialize_Positions_Normals_TextUVs(PositionsArray positions_array, NormalsArray normals_array,
                                                 TextUVsArray textUVs_array);
