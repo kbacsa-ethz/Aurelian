@@ -12,6 +12,8 @@ int MODEL_initialize(Model *model) {
     char *string = NULL;
     cJSON *element = NULL;
 
+    model -> nTextures = 0;
+
     file = UTILS_readfile("Lantern.gltf");
     model -> modelJSON = cJSON_Parse(file);
 
@@ -206,53 +208,38 @@ int MODEL_getTextures(Model *model) {
         bool skip = false;
         // get number of loaded textures
         unsigned int loadedTexture = 0;
-        for (unsigned int j = 0; j < loadedTexture; j++) {
+        for (unsigned int j = 0; j < model -> nTextures; j++) {
             // if name found
             // append loaded texture to texture list
-            skip = false;
-            break;
+            if (!strcmp(model -> textureNames + j, string)) {
+                skip = false;
+                break;
+            }
         }
 
         if (!skip) {
+            unsigned int currentTexture = model -> nTextures;
+            realloc(model -> textures, (currentTexture + 1) * sizeof(GLuint));
+
             if (strstr(string, "baseColor") != NULL) {
                 printf("Detected base color\n");
-                TEXTURE_initialize(string, GL_TEXTURE_2D, loadedTexture, GL_RGB, GL_UNSIGNED_BYTE);
-                loadedTexture++;
+                *(model -> textures + currentTexture) = TEXTURE_initialize(string, GL_TEXTURE_2D, loadedTexture, GL_RGB, GL_UNSIGNED_BYTE);
             }
             // invert metallicRoughness to roughnessMetallic
-            if (strstr(string, "roughnessMetallic") != NULL) {
+            else if (strstr(string, "roughnessMetallic") != NULL) {
                 printf("Detected base roughness\n");
                 TEXTURE_initialize(string, GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
-                loadedTexture++;
             }
+            else {
+                // raise error
+                return 1;
+            }
+
+            realloc(model -> textureNames, (currentTexture + 1) * sizeof(char*));
+            *(model -> textureNames + currentTexture) = (char*) malloc(256 * sizeof(char));
+            strcpy(*(model -> textureNames + currentTexture), string);
+            model -> nTextures++;
         }
-
-#if 0
-        // If the texture has been loaded, skip this
-        if (!skip)
-        {
-            // Load diffuse texture
-            if (texPath.find("baseColor") != std::string::npos)
-            {
-                Texture diffuse = Texture((fileDirectory + texPath).c_str(), "diffuse", loadedTex.size());
-                textures.push_back(diffuse);
-                loadedTex.push_back(diffuse);
-                loadedTexName.push_back(texPath);
-            }
-            // Load specular texture
-            else if (texPath.find("metallicRoughness") != std::string::npos)
-            {
-                Texture specular = Texture((fileDirectory + texPath).c_str(), "specular", loadedTex.size());
-                textures.push_back(specular);
-                loadedTex.push_back(specular);
-                loadedTexName.push_back(texPath);
-            }
-        }
-    }
-#endif
-
-
-
      }
     return 0;
 }
@@ -318,64 +305,6 @@ int MODEL_loadMesh(Model *model, unsigned int indMesh) {
     accessorJSON = cJSON_GetArrayItem(accessorsJSON, indAccInd);
     //intVec *indicesVec = MODEL_getIndices(model, accessorJSON);
     MODEL_getTextures(model);
-
-
-#if 0
-    std::vector<Texture> Model::getTextures()
-    {
-        std::vector<Texture> textures;
-
-        std::string fileStr = std::string(file);
-        std::string fileDirectory = fileStr.substr(0, fileStr.find_last_of('/') + 1);
-
-        // Go over all images
-        for (unsigned int i = 0; i < JSON["images"].size(); i++)
-        {
-            // uri of current texture
-            std::string texPath = JSON["images"][i]["uri"];
-
-            // Check if the texture has already been loaded
-            bool skip = false;
-            for (unsigned int j = 0; j < loadedTexName.size(); j++)
-            {
-                if (loadedTexName[j] == texPath)
-                {
-                    textures.push_back(loadedTex[j]);
-                    skip = true;
-                    break;
-                }
-            }
-
-            // If the texture has been loaded, skip this
-            if (!skip)
-            {
-                // Load diffuse texture
-                if (texPath.find("baseColor") != std::string::npos)
-                {
-                    Texture diffuse = Texture((fileDirectory + texPath).c_str(), "diffuse", loadedTex.size());
-                    textures.push_back(diffuse);
-                    loadedTex.push_back(diffuse);
-                    loadedTexName.push_back(texPath);
-                }
-                // Load specular texture
-                else if (texPath.find("metallicRoughness") != std::string::npos)
-                {
-                    Texture specular = Texture((fileDirectory + texPath).c_str(), "specular", loadedTex.size());
-                    textures.push_back(specular);
-                    loadedTex.push_back(specular);
-                    loadedTexName.push_back(texPath);
-                }
-            }
-        }
-
-        return textures;
-    }
-
-
-
-#endif
-
-
 
 #if 0
     std::vector<GLuint> Model::getIndices(json accessor)
@@ -628,6 +557,8 @@ int MODEL_delete(Model *model) {
     free(model -> rotation_mesh_array);
     free(model -> scale_mesh_array);
     free(model -> matrix_mesh_array);
+
+    // TODO: free texture memory
 
     free(model);
     return 0;
